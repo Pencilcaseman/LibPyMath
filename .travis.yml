@@ -19,12 +19,9 @@ jobs:
         - choco install python --version 3.8.0
         - export PATH="/c/Python38:/c/Python/Scripts:$PATH"
 install:
-  - python -m pip install -U setuptools wheel twine cibuildwheel==1.1.0 pytest codecov
+  - python -m pip install -U setuptools wheel twine cibuildwheel==1.1.0
 script:
   - python -m cibuildwheel --output-dir ./wheelhouse
   - ls wheelhouse
-  - pytest
 after_success:
   - if [[ $TRAVIS_TAG ]]; then python3 -m twine upload wheelhouse/*.whl; fi
-  - codecov
-  - bash <(curl -s https://codecov.io/bash)
