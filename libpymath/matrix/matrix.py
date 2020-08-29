@@ -71,10 +71,14 @@ class Matrix:
 
 				# Matrix type is based on dtype
 				if dtype == "float64":
+					# self.matrix = _matrix.Matrix(self.rows, self.cols)
 					self.matrix = _matrix.Matrix(self.rows, self.cols)
 				else:
 					raise Exception("Invalid matrix type -- this type may not yet be supported") from TypeError
 
+				self.matrix = _matrix.matrixFromData2D(data)
+
+				"""
 				index = 0
 				for row in data:
 					for element in row:
@@ -89,6 +93,7 @@ class Matrix:
 							index += 1
 						else:
 							raise Exception("Invalid value type -- must be float, int or bool") from TypeError
+				"""
 
 	def __str__(self):
 		skipRows = self.rows >= 32

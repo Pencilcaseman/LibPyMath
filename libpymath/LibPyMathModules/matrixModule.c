@@ -54,7 +54,27 @@ static PyObject *matrixNew(PyTypeObject *type, PyObject *args, PyObject *kwds) {
             return NULL;
         }
     }
+
     return (PyObject *) self;
+}
+
+static MatrixCoreObject *matrixNewInternal(PyTypeObject *type, long int rows, long int cols) {
+    MatrixCoreObject *self;
+    self = (MatrixCoreObject *) type->tp_alloc(type, 0);
+    if (self != NULL) {
+        self->rows = rows;
+        self->cols = cols;
+        self->rowStride = 1;
+        self->colStride = cols;
+        self->data = (double *) malloc(sizeof(double) * rows * cols);
+
+        if (!self->data) {
+            Py_DECREF(self);
+            return NULL;
+        }
+    }
+
+    return self;
 }
 
 static int matrixInit(MatrixCoreObject *self, PyObject *args, PyObject *kwargs) {
@@ -67,7 +87,7 @@ static int matrixInit(MatrixCoreObject *self, PyObject *args, PyObject *kwargs) 
 
     if (r == -1 && c == -1) {
         return -1;
-    } else if (r != -1  && c == -1) {
+    } else if (r != -1 && c == -1) {
         if (r <= 0)
             return -1;
 
@@ -135,6 +155,67 @@ static PyObject *matrixSetVal(MatrixCoreObject *self, PyObject *index) {
     Py_RETURN_NONE;
 }
 
+static PyObject *matrixFromData(MatrixCoreObject *self, PyObject *args) {
+    MatrixCoreObject *res;
+    PyObject *matrix;
+    long int rows;
+    long int cols;
+
+    printf("Debug Point 1\n");
+
+    if (!PyArg_ParseTuple(args, "Oii", &matrix, &rows, &cols))
+        return NULL;
+
+    res = matrixNewInternal(Py_TYPE(self), rows, cols); // (MatrixCoreObject *) self->ob_base.ob_type->tp_alloc(self->ob_base.ob_type, 0);
+
+    printf("Debug Point 2 >> %li, %li\n", res->rows, res->cols);
+
+    if (rows < 0 || cols < 0)
+        return NULL;
+
+    printf("Debug Point 3 >> %li, %li\n", res->rows, res->cols);
+
+    printf("Debug Point 4 >> %li, %li\n", res->rows, res->cols);
+
+    for (long int i = 0; i < rows; i++) {
+        printf("Debug Point 4.1 >> %li, %li\n", res->rows, res->cols);
+
+        PyObject *row;
+
+        printf("Debug Point 4.2 >> %li, %li\n", res->rows, res->cols);
+
+        row = PyList_GetItem(matrix, i);
+
+        printf("Debug Point 4.3 >> %li, %li\n", res->rows, res->cols);
+
+        for (long int j = 0; j < cols; j++) {
+            printf("Debug Point 4.3.1 >> %li, %li\n", res->rows, res->cols);
+
+            PyObject *element;
+
+            printf("Debug Point 4.3.2 >> %li, %li\n", res->rows, res->cols);
+
+            element = PyList_GetItem(row, j);
+
+            printf("Debug Point 4.3.3 >> %li, %li\n", res->rows, res->cols);
+
+            if (!PyFloat_Check(element))
+                return NULL;
+
+            printf("Debug Point 4.3.4 >> %li, %li\n", res->rows, res->cols);;
+
+            res->data[j + i * cols] = PyFloat_AsDouble(element);
+
+            printf("Debug Point 4.3.5 >> %li, %li\n", res->rows, res->cols);
+        }
+    }
+
+    printf("Debug Point 5 >> %li, %li\n", res->rows, res->cols);
+    Py_INCREF(res);
+    printf("Debug Point 6 >> %li, %li\n", res->rows, res->cols);
+    return (PyObject *) res;
+}
+
 static PyMemberDef matrixMembers[] = {
         {NULL}
 };
@@ -160,17 +241,22 @@ static PyObject *matrixGetColStride(MatrixCoreObject *self, void *closure) {
 }
 
 static PyGetSetDef matrixGetSet[] = {
-        {"rows", (getter) matrixGetRows, NULL, "Rows of matrix", NULL},
-        {"cols", (getter) matrixGetCols, NULL, "Columns of matrix", NULL},
-        {"rowStride", (getter) matrixGetRowStride, NULL, "Row stride of matrix", NULL},
+        {"rows",      (getter) matrixGetRows,      NULL, "Rows of matrix",          NULL},
+        {"cols",      (getter) matrixGetCols,      NULL, "Columns of matrix",       NULL},
+        {"rowStride", (getter) matrixGetRowStride, NULL, "Row stride of matrix",    NULL},
         {"colStride", (getter) matrixGetColStride, NULL, "Column stride of matrix", NULL},
         {NULL}
 };
 
 static PyMethodDef matrixMethods[] = {
-        {"get", (PyCFunction) matrixGetVal, METH_VARARGS, "Set a value in the matrix"},
-        {"set", (PyCFunction) matrixSetVal, METH_VARARGS, "Get a value in the matrix"},
-        {"toString", (PyCFunction) matrixToString, METH_NOARGS, "Give the matrix object as a string"},
+        {"get",      (PyCFunction) matrixGetVal,   METH_VARARGS, "Set a value in the matrix"},
+        {"set",      (PyCFunction) matrixSetVal,   METH_VARARGS, "Get a value in the matrix"},
+        {"toString", (PyCFunction) matrixToString, METH_NOARGS,  "Give the matrix object as a string"},
+        {NULL}
+};
+
+static PyMethodDef matrixFunctionMethods[] = {
+        {"matrixFromData2D", (PyCFunction) matrixFromData, METH_VARARGS, "Create a new matrix from a 2D list of data"},
         {NULL}
 };
 
@@ -194,7 +280,8 @@ static PyModuleDef matrixCoreModule = {
         PyModuleDef_HEAD_INIT,
         .m_name = "matrix",
         .m_doc = "Matrix module for Python",
-        .m_size = -1
+        .m_size = -1,
+        matrixFunctionMethods
 };
 
 PyMODINIT_FUNC
