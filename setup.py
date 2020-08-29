@@ -33,7 +33,7 @@ except ImportError:
 
 this_directory = Path(__file__).parent
 long_description = (this_directory / 'README.md').read_text(encoding='utf-8')
-compiler_flags = [] #["-C99"]
+compiler_flags = ["-std=c99"]
 
 ext_modules = [
     Extension(
