@@ -1,0 +1,15 @@
+README.md
+setup.py
+LibPyMath/LibPyMathModules/matrixModule.c
+LibPyMath/LibPyMathModules/testModule.c
+LibPyMath/LibPyMathModules/matrixModule.c
+LibPyMath/LibPyMathModules/testModule.c
+libpymath/__init__.py
+libpymath.egg-info/PKG-INFO
+libpymath.egg-info/SOURCES.txt
+libpymath.egg-info/dependency_links.txt
+libpymath.egg-info/top_level.txt
+libpymath/matrix/__init__.py
+libpymath/matrix/matrix.py
+libpymath/testModule/__init__.py
+libpymath/testModule/testScript.py
