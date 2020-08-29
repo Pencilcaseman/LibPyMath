@@ -37,17 +37,17 @@ long_description = (this_directory / 'README.md').read_text(encoding='utf-8')
 ext_modules = [
     Extension(
         "libpymath.core.testModule",
-        ["LibPyMath/LibPyMathModules/testModule.c"],
+        ["libpymath/LibPyMathModules/testModule.c"],
     ),
     Extension(
         "libpymath.core.matrix",
-        ["LibPyMath/LibPyMathModules/matrixModule.c"],
+        ["libpymath/LibPyMathModules/matrixModule.c"],
     )
 ]
 
 setup(
     name="libpymath",
-    version="0.0.11",
+    version="0.0.12",
     description="A general purpose Python math module",
     long_description=long_description,
     long_description_content_type='text/markdown',
