@@ -33,15 +33,18 @@ except ImportError:
 
 this_directory = Path(__file__).parent
 long_description = (this_directory / 'README.md').read_text(encoding='utf-8')
+compiler_flags = ["-C99"]
 
 ext_modules = [
     Extension(
         "libpymath.core.testModule",
         ["libpymath/LibPyMathModules/testModule.c"],
+        extra_compile_args=compiler_flags
     ),
     Extension(
         "libpymath.core.matrix",
         ["libpymath/LibPyMathModules/matrixModule.c"],
+        extra_compile_args=compiler_flags
     )
 ]
 
