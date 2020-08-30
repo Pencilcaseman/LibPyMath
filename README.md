@@ -3,6 +3,7 @@
 [![PyPI version fury.io](https://badge.fury.io/py/libpymath.svg)](https://pypi.python.org/pypi/libpymath/)
 [![PyPI license](https://img.shields.io/pypi/l/libpymath.svg)](https://pypi.python.org/pypi/libpymath/)
 [![PyPI pyversions](https://img.shields.io/pypi/pyversions/libpymath.svg)](https://pypi.python.org/pypi/libpymath/)
+[![Downloads per month](https://img.shields.io/pypi/dm/libpymath.svg)](https://pypi.python.org/pypi/libpymath/)
 
 # LibPyMath
 ### A fast, general purpose Python library

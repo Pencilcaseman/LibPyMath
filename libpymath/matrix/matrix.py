@@ -76,7 +76,7 @@ class Matrix:
 				else:
 					raise Exception("Invalid matrix type -- this type may not yet be supported") from TypeError
 
-				self.matrix = _matrix.matrixFromData2D(data)
+				self.matrix = _matrix.matrixFromData2D(data, self.rows, self.cols)
 
 				"""
 				index = 0

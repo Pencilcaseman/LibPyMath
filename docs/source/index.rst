@@ -1,0 +1,17 @@
+Libpymath Documentation
+=======================
+
+This is some text that is here for no reason.
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`

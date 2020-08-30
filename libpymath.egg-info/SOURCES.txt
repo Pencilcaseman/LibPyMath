@@ -1,7 +1,5 @@
 README.md
 setup.py
-LibPyMath/LibPyMathModules/matrixModule.c
-LibPyMath/LibPyMathModules/testModule.c
 libpymath/__init__.py
 libpymath.egg-info/PKG-INFO
 libpymath.egg-info/SOURCES.txt

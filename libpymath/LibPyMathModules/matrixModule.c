@@ -24,6 +24,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <Python.h>
 #include <structmember.h>
 
+static PyTypeObject MatrixCoreType;
+
 typedef struct {
     PyObject_HEAD
 
@@ -47,7 +49,7 @@ static PyObject *matrixNew(PyTypeObject *type, PyObject *args, PyObject *kwds) {
         self->cols = 0;
         self->rowStride = 0;
         self->colStride = 0;
-        self->data = (double *) malloc(sizeof(double));
+        self->data = malloc(sizeof(double));
 
         if (!self->data) {
             Py_DECREF(self);
@@ -56,25 +58,6 @@ static PyObject *matrixNew(PyTypeObject *type, PyObject *args, PyObject *kwds) {
     }
 
     return (PyObject *) self;
-}
-
-static MatrixCoreObject *matrixNewInternal(PyTypeObject *type, long int rows, long int cols) {
-    MatrixCoreObject *self;
-    self = (MatrixCoreObject *) type->tp_alloc(type, 0);
-    if (self != NULL) {
-        self->rows = rows;
-        self->cols = cols;
-        self->rowStride = 1;
-        self->colStride = cols;
-        self->data = (double *) malloc(sizeof(double) * rows * cols);
-
-        if (!self->data) {
-            Py_DECREF(self);
-            return NULL;
-        }
-    }
-
-    return self;
 }
 
 static int matrixInit(MatrixCoreObject *self, PyObject *args, PyObject *kwargs) {
@@ -95,7 +78,7 @@ static int matrixInit(MatrixCoreObject *self, PyObject *args, PyObject *kwargs) 
         self->cols = r;
         self->rowStride = 1;
         self->colStride = r;
-        self->data = (double *) malloc(sizeof(double) * r * r);
+        self->data = malloc(sizeof(double) * r * r);
 
         if (!self->data) {
             PyErr_SetString(PyExc_MemoryError, "There was not enough memory to allocate an array of this size");
@@ -109,7 +92,7 @@ static int matrixInit(MatrixCoreObject *self, PyObject *args, PyObject *kwargs) 
         self->cols = c;
         self->rowStride = 1;
         self->colStride = c;
-        self->data = (double *) malloc(sizeof(double) * r * c);
+        self->data = malloc(sizeof(double) * r * c);
 
         if (!self->data) {
             PyErr_SetString(PyExc_MemoryError, "There was not enough memory to allocate an array of this size");
@@ -155,9 +138,94 @@ static PyObject *matrixSetVal(MatrixCoreObject *self, PyObject *index) {
     Py_RETURN_NONE;
 }
 
+static double *allocateMemory(unsigned long length) {
+    double *res;
+
+    if (length < 0) {
+        PyErr_NoMemory();
+        return NULL;
+    }
+
+    res = malloc(sizeof(double) * length);
+
+    if (!res) {
+        PyErr_NoMemory();
+        return NULL;
+    }
+
+    return res;
+}
+
+static MatrixCoreObject *matrixNewC(double *data, long int rows, long int cols) {
+    MatrixCoreObject *res;
+
+    double *resData = allocateMemory(rows * cols);
+    if (!resData) {
+        return NULL;
+    }
+
+    memcpy(resData, data, sizeof(double) * rows * cols);
+
+    if (PyType_Ready(&MatrixCoreType) < 0) {
+        free(resData);
+        return NULL;
+    }
+
+    res = PyObject_New(MatrixCoreObject, &MatrixCoreType);
+    if (res == NULL) {
+        free(resData);
+        return NULL;
+    }
+
+    res->rows = rows;
+    res->cols = cols;
+    res->data = resData;
+
+    return res;
+}
+
+static PyObject *matrixFromData(MatrixCoreObject *self, PyObject *args) {
+    PyObject *matrix;
+    double *matrixData;
+    long int rows;
+    long int cols;
+
+    if (!PyArg_ParseTuple(args, "Oii", &matrix, &rows, &cols))
+        return NULL;
+
+    if (rows < 0 || cols < 0)
+        return NULL;
+
+    matrixData = allocateMemory(rows * cols);
+
+    if (!matrixData) {
+        return NULL;
+    }
+
+    for (long int i = 0; i < rows; i++) {
+        PyObject *row;
+        row = PyList_GetItem(matrix, i);
+
+        for (long int j = 0; j < cols; j++) {
+            PyObject *element;
+            element = PyList_GetItem(row, j);
+
+            if (!PyFloat_Check(element))
+                return NULL;
+
+            matrixData[j + i * cols] = PyFloat_AsDouble(element);
+        }
+    }
+
+    return (PyObject *) matrixNewC(matrixData, rows, cols);
+}
+
+/*
 static PyObject *matrixFromData(MatrixCoreObject *self, PyObject *args) {
     MatrixCoreObject *res;
     PyObject *matrix;
+
+    double *matrixData;
     long int rows;
     long int cols;
 
@@ -165,8 +233,6 @@ static PyObject *matrixFromData(MatrixCoreObject *self, PyObject *args) {
 
     if (!PyArg_ParseTuple(args, "Oii", &matrix, &rows, &cols))
         return NULL;
-
-    res = matrixNewInternal(Py_TYPE(self), rows, cols); // (MatrixCoreObject *) self->ob_base.ob_type->tp_alloc(self->ob_base.ob_type, 0);
 
     printf("Debug Point 2 >> %li, %li\n", res->rows, res->cols);
 
@@ -204,7 +270,7 @@ static PyObject *matrixFromData(MatrixCoreObject *self, PyObject *args) {
 
             printf("Debug Point 4.3.4 >> %li, %li\n", res->rows, res->cols);;
 
-            res->data[j + i * cols] = PyFloat_AsDouble(element);
+            matrixData[j + i * cols] = PyFloat_AsDouble(element);
 
             printf("Debug Point 4.3.5 >> %li, %li\n", res->rows, res->cols);
         }
@@ -213,8 +279,10 @@ static PyObject *matrixFromData(MatrixCoreObject *self, PyObject *args) {
     printf("Debug Point 5 >> %li, %li\n", res->rows, res->cols);
     Py_INCREF(res);
     printf("Debug Point 6 >> %li, %li\n", res->rows, res->cols);
-    return (PyObject *) res;
+    // return (PyObject *) res;
+    return Py_BuildValue("O", res);
 }
+*/
 
 static PyMemberDef matrixMembers[] = {
         {NULL}
