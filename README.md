@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.com/Pencilcaseman/LibPyMath.svg?branch=master)](https://travis-ci.com/Pencilcaseman/LibPyMath)
-[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/Pencilcaseman/LibPyMath)
+[![Documentation Status](https://readthedocs.org/projects/libpymath/badge/?version=latest)](https://libpymath.readthedocs.io/en/latest/?badge=latest)
 [![PyPI version fury.io](https://badge.fury.io/py/libpymath.svg)](https://pypi.python.org/pypi/libpymath/)
 [![PyPI license](https://img.shields.io/pypi/l/libpymath.svg)](https://pypi.python.org/pypi/libpymath/)
 [![PyPI pyversions](https://img.shields.io/pypi/pyversions/libpymath.svg)](https://pypi.python.org/pypi/libpymath/)
@@ -31,4 +31,8 @@ matrixData = [[1, 2, 3],
 mat = Matrix(data=matrixData)
 
 print(mat)
+
+>>> [[1, 2, 3]
+     [4, 5, 6]
+     [7, 8, 9]]
 ```

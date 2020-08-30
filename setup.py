@@ -50,7 +50,7 @@ ext_modules = [
 
 setup(
     name="libpymath",
-    version="0.0.13",
+    version="0.0.14",
     description="A general purpose Python math module",
     long_description=long_description,
     long_description_content_type='text/markdown',

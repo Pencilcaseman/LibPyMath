@@ -76,8 +76,8 @@ static int matrixInit(MatrixCoreObject *self, PyObject *args, PyObject *kwargs) 
 
         self->rows = r;
         self->cols = r;
-        self->rowStride = 1;
-        self->colStride = r;
+        self->rowStride = c;
+        self->colStride = 1;
         self->data = malloc(sizeof(double) * r * r);
 
         if (!self->data) {
@@ -90,8 +90,8 @@ static int matrixInit(MatrixCoreObject *self, PyObject *args, PyObject *kwargs) 
 
         self->rows = r;
         self->cols = c;
-        self->rowStride = 1;
-        self->colStride = c;
+        self->rowStride = c;
+        self->colStride = 1;
         self->data = malloc(sizeof(double) * r * c);
 
         if (!self->data) {
@@ -179,6 +179,8 @@ static MatrixCoreObject *matrixNewC(double *data, long int rows, long int cols) 
 
     res->rows = rows;
     res->cols = cols;
+    res->rowStride = 1;
+    res->colStride = cols;
     res->data = resData;
 
     return res;
@@ -210,79 +212,19 @@ static PyObject *matrixFromData(MatrixCoreObject *self, PyObject *args) {
             PyObject *element;
             element = PyList_GetItem(row, j);
 
-            if (!PyFloat_Check(element))
+            if (PyFloat_Check(element))
+                matrixData[j + i * cols] = PyFloat_AsDouble(element);
+            else if (PyLong_Check(element))
+                matrixData[j + i * cols] = PyLong_AsDouble(element);
+            else {
+                PyErr_SetString(PyExc_TypeError, "Invalid type for matrix initialization. Must be int or float");
                 return NULL;
-
-            matrixData[j + i * cols] = PyFloat_AsDouble(element);
+            }
         }
     }
 
     return (PyObject *) matrixNewC(matrixData, rows, cols);
 }
-
-/*
-static PyObject *matrixFromData(MatrixCoreObject *self, PyObject *args) {
-    MatrixCoreObject *res;
-    PyObject *matrix;
-
-    double *matrixData;
-    long int rows;
-    long int cols;
-
-    printf("Debug Point 1\n");
-
-    if (!PyArg_ParseTuple(args, "Oii", &matrix, &rows, &cols))
-        return NULL;
-
-    printf("Debug Point 2 >> %li, %li\n", res->rows, res->cols);
-
-    if (rows < 0 || cols < 0)
-        return NULL;
-
-    printf("Debug Point 3 >> %li, %li\n", res->rows, res->cols);
-
-    printf("Debug Point 4 >> %li, %li\n", res->rows, res->cols);
-
-    for (long int i = 0; i < rows; i++) {
-        printf("Debug Point 4.1 >> %li, %li\n", res->rows, res->cols);
-
-        PyObject *row;
-
-        printf("Debug Point 4.2 >> %li, %li\n", res->rows, res->cols);
-
-        row = PyList_GetItem(matrix, i);
-
-        printf("Debug Point 4.3 >> %li, %li\n", res->rows, res->cols);
-
-        for (long int j = 0; j < cols; j++) {
-            printf("Debug Point 4.3.1 >> %li, %li\n", res->rows, res->cols);
-
-            PyObject *element;
-
-            printf("Debug Point 4.3.2 >> %li, %li\n", res->rows, res->cols);
-
-            element = PyList_GetItem(row, j);
-
-            printf("Debug Point 4.3.3 >> %li, %li\n", res->rows, res->cols);
-
-            if (!PyFloat_Check(element))
-                return NULL;
-
-            printf("Debug Point 4.3.4 >> %li, %li\n", res->rows, res->cols);;
-
-            matrixData[j + i * cols] = PyFloat_AsDouble(element);
-
-            printf("Debug Point 4.3.5 >> %li, %li\n", res->rows, res->cols);
-        }
-    }
-
-    printf("Debug Point 5 >> %li, %li\n", res->rows, res->cols);
-    Py_INCREF(res);
-    printf("Debug Point 6 >> %li, %li\n", res->rows, res->cols);
-    // return (PyObject *) res;
-    return Py_BuildValue("O", res);
-}
-*/
 
 static PyMemberDef matrixMembers[] = {
         {NULL}
@@ -293,19 +235,19 @@ static PyObject *matrixToString(MatrixCoreObject *self, PyObject *Py_UNUSED(igno
 }
 
 static PyObject *matrixGetRows(MatrixCoreObject *self, void *closure) {
-    return Py_BuildValue("l", self->rows);
+    return PyLong_FromLong(self->rows);
 }
 
 static PyObject *matrixGetCols(MatrixCoreObject *self, void *closure) {
-    return Py_BuildValue("l", self->cols);
+    return PyLong_FromLong(self->cols);
 }
 
 static PyObject *matrixGetRowStride(MatrixCoreObject *self, void *closure) {
-    return Py_BuildValue("l", self->rowStride);
+    return PyLong_FromLong(self->rowStride);
 }
 
 static PyObject *matrixGetColStride(MatrixCoreObject *self, void *closure) {
-    return Py_BuildValue("l", self->colStride);
+    return PyLong_FromLong(self->colStride);
 }
 
 static PyGetSetDef matrixGetSet[] = {
