@@ -24,6 +24,9 @@ author = 'Toby Davis'
 # The full version, including alpha/beta/rc tags
 release = '0.0.13'
 
+# Set the master file
+master_doc = 'index'
+
 
 # -- General configuration ---------------------------------------------------
 
