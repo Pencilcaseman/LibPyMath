@@ -26,6 +26,16 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 static PyTypeObject MatrixCoreType;
 
+// Print to python stdout
+void writeout(const char *nullterminated) {
+    PyObject *sysmod = PyImport_ImportModuleNoBlock("sys");
+    PyObject *pystdout = PyObject_GetAttrString(sysmod, "stdout");
+    PyObject *result = PyObject_CallMethod(pystdout, "write", "s", nullterminated);
+    Py_XDECREF(result);
+    Py_XDECREF(pystdout);
+    Py_XDECREF(sysmod);
+}
+
 typedef struct {
     PyObject_HEAD
 
