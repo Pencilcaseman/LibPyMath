@@ -20,7 +20,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 from libpymath.core import matrix as _matrix
-from random import uniform
 
 
 class Matrix:
@@ -36,9 +35,9 @@ class Matrix:
 
         self.matrix = None
         self.rows = None
+        self.cols = None
         self.rowStride = None
         self.colStride = None
-        self.cols = None
         self.dtype = None
 
         if dtype is not None:
@@ -157,3 +156,14 @@ class Matrix:
 
     def __repr__(self):
         return str(self)
+
+    def copy(self):
+        res = Matrix(data=[[0]])
+        res.matrix = self.matrix.copy()
+        res.rows = self.rows
+        res.cols = self.cols
+        res.rowStride = self.rowStride
+        res.colStride = self.colStride
+        res.dtype = self.dtype
+
+        return res

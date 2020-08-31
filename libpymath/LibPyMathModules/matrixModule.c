@@ -26,8 +26,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 static PyTypeObject MatrixCoreType;
 
+// **************************************************************************************************************************** //
+// ==================================================== Internal Functions ==================================================== //
+// **************************************************************************************************************************** //
+
 // Print to python stdout
-void writeout(const char *nullterminated) {
+void pythonPrint(const char *nullterminated) {
     PyObject *sysmod = PyImport_ImportModuleNoBlock("sys");
     PyObject *pystdout = PyObject_GetAttrString(sysmod, "stdout");
     PyObject *result = PyObject_CallMethod(pystdout, "write", "s", nullterminated);
@@ -35,6 +39,32 @@ void writeout(const char *nullterminated) {
     Py_XDECREF(pystdout);
     Py_XDECREF(sysmod);
 }
+
+// ****************************************************************************************************************************** //
+// ==================================================== Function Definitions ==================================================== //
+// ****************************************************************************************************************************** //
+
+static double *allocateMemory(long int length) {
+    double *res;
+
+    if (length < 0) {
+        PyErr_SetString(PyExc_ValueError, "Cannot allocate negative length");
+        return NULL;
+    }
+
+    res = malloc(sizeof(double) * length);
+
+    if (res == NULL) {
+        PyErr_SetString(PyExc_MemoryError, "Out of memory");
+        return NULL;
+    }
+
+    return res;
+}
+
+// ********************************************************************************************************************** //
+// ==================================================== Matrix Class ==================================================== //
+// ********************************************************************************************************************** //
 
 typedef struct {
     PyObject_HEAD
@@ -149,25 +179,7 @@ static PyObject *matrixSetVal(MatrixCoreObject *self, PyObject *index) {
     Py_RETURN_NONE;
 }
 
-static double *allocateMemory(long int length) {
-    double *res;
-
-    if (length < 0) {
-        PyErr_SetString(PyExc_ValueError, "Cannot allocate negative length");
-        return NULL;
-    }
-
-    res = malloc(sizeof(double) * length);
-
-    if (res == NULL) {
-        PyErr_SetString(PyExc_MemoryError, "Out of memory");
-        return NULL;
-    }
-
-    return res;
-}
-
-static MatrixCoreObject *matrixNewC(double *data, long int rows, long int cols) {
+static MatrixCoreObject *matrixNewC(double *data, long int rows, long int cols, int t) {
     MatrixCoreObject *res;
 
     double *resData = allocateMemory(rows * cols);
@@ -191,12 +203,53 @@ static MatrixCoreObject *matrixNewC(double *data, long int rows, long int cols) 
 
     res->rows = rows;
     res->cols = cols;
-    res->rowStride = 1;
-    res->colStride = cols;
+    res->rowStride = t == 0 ? 1 : cols;
+    res->colStride = t == 0 ? cols : 1;
     res->data = resData;
 
     return res;
 }
+
+static PyObject *matrixCopy(MatrixCoreObject *self) {
+    double *res = allocateMemory(self->rows * self->cols);
+    if (res == NULL) {
+        PyErr_SetString(PyExc_MemoryError, "Unable to allocate memory");
+        return NULL;
+    }
+
+    memcpy(res, self->data, sizeof(double) * self->rows * self->cols);
+
+    // TODO: Ensure this does the correct thing...
+    return (PyObject *) matrixNewC(res, self->rows, self->cols, self->colStride != 1);
+}
+
+static PyMemberDef matrixMembers[] = {
+        {NULL}
+};
+
+static PyObject *matrixToString(MatrixCoreObject *self, PyObject *Py_UNUSED(ignored)) {
+    return PyUnicode_FromFormat("%s%i%s%i%s", "Matrix(rows = ", self->rows, ", cols = ", self->cols, ")");
+}
+
+static PyObject *matrixGetRows(MatrixCoreObject *self, void *closure) {
+    return PyLong_FromLong(self->rows);
+}
+
+static PyObject *matrixGetCols(MatrixCoreObject *self, void *closure) {
+    return PyLong_FromLong(self->cols);
+}
+
+static PyObject *matrixGetRowStride(MatrixCoreObject *self, void *closure) {
+    return PyLong_FromLong(self->rowStride);
+}
+
+static PyObject *matrixGetColStride(MatrixCoreObject *self, void *closure) {
+    return PyLong_FromLong(self->colStride);
+}
+
+// ************************************************************************************************************************** //
+// ==================================================== Matrix Functions ==================================================== //
+// ************************************************************************************************************************** //
 
 static PyObject *matrixFromData(MatrixCoreObject *self, PyObject *args) {
     PyObject *matrix;
@@ -235,32 +288,12 @@ static PyObject *matrixFromData(MatrixCoreObject *self, PyObject *args) {
         }
     }
 
-    return (PyObject *) matrixNewC(matrixData, rows, cols);
+    return (PyObject *) matrixNewC(matrixData, rows, cols, 0);
 }
 
-static PyMemberDef matrixMembers[] = {
-        {NULL}
-};
-
-static PyObject *matrixToString(MatrixCoreObject *self, PyObject *Py_UNUSED(ignored)) {
-    return PyUnicode_FromFormat("%s%i%s%i%s", "Matrix(rows = ", self->rows, ", cols = ", self->cols, ")");
-}
-
-static PyObject *matrixGetRows(MatrixCoreObject *self, void *closure) {
-    return PyLong_FromLong(self->rows);
-}
-
-static PyObject *matrixGetCols(MatrixCoreObject *self, void *closure) {
-    return PyLong_FromLong(self->cols);
-}
-
-static PyObject *matrixGetRowStride(MatrixCoreObject *self, void *closure) {
-    return PyLong_FromLong(self->rowStride);
-}
-
-static PyObject *matrixGetColStride(MatrixCoreObject *self, void *closure) {
-    return PyLong_FromLong(self->colStride);
-}
+// **************************************************************************************************************************** //
+// ==================================================== Module Definitions ==================================================== //
+// **************************************************************************************************************************** //
 
 static PyGetSetDef matrixGetSet[] = {
         {"rows",      (getter) matrixGetRows,      NULL, "Rows of matrix",          NULL},
@@ -274,6 +307,7 @@ static PyMethodDef matrixMethods[] = {
         {"get",      (PyCFunction) matrixGetVal,   METH_VARARGS, "Set a value in the matrix"},
         {"set",      (PyCFunction) matrixSetVal,   METH_VARARGS, "Get a value in the matrix"},
         {"toString", (PyCFunction) matrixToString, METH_NOARGS,  "Give the matrix object as a string"},
+        {"copy",     (PyCFunction) matrixCopy,     METH_NOARGS, "Return an exact copy of a matrix"},
         {NULL}
 };
 
