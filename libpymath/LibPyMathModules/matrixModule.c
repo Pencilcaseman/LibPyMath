@@ -51,8 +51,9 @@ static PyObject *matrixNew(PyTypeObject *type, PyObject *args, PyObject *kwds) {
         self->colStride = 0;
         self->data = malloc(sizeof(double));
 
-        if (!self->data) {
+        if (self->data == NULL) {
             Py_DECREF(self);
+            PyErr_SetString(PyExc_ValueError, "Out of memory");
             return NULL;
         }
     }
@@ -80,7 +81,7 @@ static int matrixInit(MatrixCoreObject *self, PyObject *args, PyObject *kwargs) 
         self->colStride = 1;
         self->data = malloc(sizeof(double) * r * r);
 
-        if (!self->data) {
+        if (self->data == NULL) {
             PyErr_SetString(PyExc_MemoryError, "There was not enough memory to allocate an array of this size");
             return -1;
         }
@@ -94,7 +95,7 @@ static int matrixInit(MatrixCoreObject *self, PyObject *args, PyObject *kwargs) 
         self->colStride = 1;
         self->data = malloc(sizeof(double) * r * c);
 
-        if (!self->data) {
+        if (self->data == NULL) {
             PyErr_SetString(PyExc_MemoryError, "There was not enough memory to allocate an array of this size");
             return -1;
         }
@@ -148,7 +149,7 @@ static double *allocateMemory(unsigned long length) {
 
     res = malloc(sizeof(double) * length);
 
-    if (!res) {
+    if (res == NULL) {
         PyErr_SetString(PyExc_ValueError, "Out of memory");
         return NULL;
     }
