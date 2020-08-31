@@ -142,14 +142,14 @@ static double *allocateMemory(unsigned long length) {
     double *res;
 
     if (length < 0) {
-        PyErr_NoMemory();
+        PyErr_SetString(PyExc_ValueError, "LibPyMath Core -- cannot allocate negative length");
         return NULL;
     }
 
     res = malloc(sizeof(double) * length);
 
     if (!res) {
-        PyErr_NoMemory();
+        PyErr_SetString(PyExc_ValueError, "Out of memory");
         return NULL;
     }
 
