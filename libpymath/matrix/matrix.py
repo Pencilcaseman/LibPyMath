@@ -33,7 +33,6 @@ class Matrix:
 		"""
 
 		self.matrix = None
-		self.shape = None
 		self.rows = None
 		self.rowStride = None
 		self.colStride = None
@@ -69,16 +68,12 @@ class Matrix:
 				self.cols = l
 				self.rowStride = self.cols
 				self.colStride = 1
-				self.shape = (self.rows, self.cols)
 
 				# Matrix type is based on dtype
 				if dtype == "float64":
-					# self.matrix = _matrix.Matrix(self.rows, self.cols)
-					self.matrix = _matrix.Matrix(self.rows, self.cols)
+					self.matrix = _matrix.matrixFromData2D(data, self.rows, self.cols)
 				else:
 					raise Exception("Invalid matrix type -- this type may not yet be supported") from TypeError
-
-				self.matrix = _matrix.matrixFromData2D(data, self.rows, self.cols)
 
 	def __str__(self):
 		skipRows = self.rows >= 32

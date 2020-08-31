@@ -139,18 +139,18 @@ static PyObject *matrixSetVal(MatrixCoreObject *self, PyObject *index) {
     Py_RETURN_NONE;
 }
 
-static double *allocateMemory(unsigned long length) {
+static double *allocateMemory(long int length) {
     double *res;
 
     if (length < 0) {
-        PyErr_SetString(PyExc_ValueError, "LibPyMath Core -- cannot allocate negative length");
+        PyErr_SetString(PyExc_ValueError, "Cannot allocate negative length");
         return NULL;
     }
 
     res = malloc(sizeof(double) * length);
 
     if (res == NULL) {
-        PyErr_SetString(PyExc_ValueError, "Out of memory");
+        PyErr_SetString(PyExc_MemoryError, "Out of memory");
         return NULL;
     }
 
@@ -161,7 +161,8 @@ static MatrixCoreObject *matrixNewC(double *data, long int rows, long int cols) 
     MatrixCoreObject *res;
 
     double *resData = allocateMemory(rows * cols);
-    if (!resData) {
+    if (resData == NULL) {
+        PyErr_SetString(PyExc_MemoryError, "Out of memory");
         return NULL;
     }
 
@@ -193,7 +194,7 @@ static PyObject *matrixFromData(MatrixCoreObject *self, PyObject *args) {
     long int rows;
     long int cols;
 
-    if (!PyArg_ParseTuple(args, "Oii", &matrix, &rows, &cols))
+    if (!PyArg_ParseTuple(args, "Oll", &matrix, &rows, &cols))
         return NULL;
 
     if (rows < 0 || cols < 0)
