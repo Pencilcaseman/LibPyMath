@@ -2,7 +2,7 @@ language: python
 os: linux
 env:
   global:
-    - CIBW_SKIP=cp34-*
+    # - CIBW_SKIP=cp34-*
     - CIBW_BUILD=cp3?-*
     - CIBW_MANYLINUX_X86_64_IMAGE=manylinux1
     - CIBW_MANYLINUX_I686_IMAGE=manylinux1
