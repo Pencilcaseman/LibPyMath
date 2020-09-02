@@ -24,6 +24,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <Python.h>
 #include <structmember.h>
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
 static PyTypeObject MatrixCoreType;
 
 // **************************************************************************************************************************** //
@@ -31,14 +35,16 @@ static PyTypeObject MatrixCoreType;
 // **************************************************************************************************************************** //
 
 // Print to python stdout
-void pythonPrint(const char *nullterminated) {
+void pythonPrint(const char *text) {
     PyObject *sysmod = PyImport_ImportModuleNoBlock("sys");
     PyObject *pystdout = PyObject_GetAttrString(sysmod, "stdout");
-    PyObject *result = PyObject_CallMethod(pystdout, "write", "s", nullterminated);
+    PyObject *result = PyObject_CallMethod(pystdout, "write", "s", text);
     Py_XDECREF(result);
     Py_XDECREF(pystdout);
     Py_XDECREF(sysmod);
 }
+
+#define internalGet(i, j, r, c) ((j) * (c) + (i) * (r))
 
 // ****************************************************************************************************************************** //
 // ==================================================== Function Definitions ==================================================== //
@@ -146,14 +152,15 @@ static int matrixInit(MatrixCoreObject *self, PyObject *args, PyObject *kwargs) 
 
 static PyObject *matrixGetVal(MatrixCoreObject *self, PyObject *index) {
     long int i;
+    long int j;
 
-    if (!PyArg_ParseTuple(index, "l", &i))
+    if (!PyArg_ParseTuple(index, "ll", &i, &j))
         return NULL;
 
     double res;
 
-    if (i < self->rows * self->cols && i >= 0) {
-        res = self->data[i];
+    if (i < self->rows && j < self->cols && i >= 0 && j >= 0) {
+        res = self->data[internalGet(i, j, self->rowStride, self->colStride)];
     } else {
         PyErr_SetString(PyExc_IndexError, "Index out of range for matrix get");
         return NULL;
@@ -164,13 +171,14 @@ static PyObject *matrixGetVal(MatrixCoreObject *self, PyObject *index) {
 
 static PyObject *matrixSetVal(MatrixCoreObject *self, PyObject *index) {
     long int i;
+    long int j;
     double val;
 
-    if (!PyArg_ParseTuple(index, "ld", &i, &val))
+    if (!PyArg_ParseTuple(index, "lld", &i, &j, &val))
         return NULL;
 
-    if (i < self->rows * self->cols && i >= 0) {
-        self->data[i] = val;
+    if (i < self->rows && j < self->cols && i >= 0 && j >= 0) {
+        self->data[internalGet(i, j, self->rowStride, self->colStride)] = val;
     } else {
         PyErr_SetString(PyExc_IndexError, "Index out of range for matrix set");
         return NULL;
@@ -203,8 +211,8 @@ static MatrixCoreObject *matrixNewC(double *data, long int rows, long int cols, 
 
     res->rows = rows;
     res->cols = cols;
-    res->rowStride = t == 0 ? 1 : cols;
-    res->colStride = t == 0 ? cols : 1;
+    res->rowStride = (t == 0) ? cols : 1;
+    res->colStride = (t == 0) ? 1 : cols;
     res->data = resData;
 
     return res;
@@ -247,15 +255,29 @@ static PyObject *matrixGetColStride(MatrixCoreObject *self, void *closure) {
     return PyLong_FromLong(self->colStride);
 }
 
+static PyObject *matrixTransposeMagic(MatrixCoreObject *self) {
+    long int tmp;
+    tmp = self->rowStride;
+
+    self->rowStride = self->colStride;
+    self->colStride = tmp;
+
+    tmp = self->rows;
+    self->rows = self->cols;
+    self->cols = tmp;
+
+    Py_RETURN_NONE;
+}
+
 // ************************************************************************************************************************** //
 // ==================================================== Matrix Functions ==================================================== //
 // ************************************************************************************************************************** //
 
-static PyObject *matrixFromData(MatrixCoreObject *self, PyObject *args) {
+static PyObject *matrixFromData2D(MatrixCoreObject *self, PyObject *args) {
     PyObject *matrix;
     double *matrixData;
-    long int rows;
-    long int cols;
+    long int rows = -1;
+    long int cols = -1;
 
     if (!PyArg_ParseTuple(args, "Oll", &matrix, &rows, &cols))
         return NULL;
@@ -278,13 +300,48 @@ static PyObject *matrixFromData(MatrixCoreObject *self, PyObject *args) {
             element = PyList_GetItem(row, j);
 
             if (PyFloat_Check(element))
-                matrixData[j + i * cols] = PyFloat_AsDouble(element);
+                matrixData[internalGet(i, j, cols, 1L)] = PyFloat_AsDouble(element);
             else if (PyLong_Check(element))
-                matrixData[j + i * cols] = PyLong_AsDouble(element);
+                matrixData[internalGet(i, j, cols, 1L)] = PyLong_AsDouble(element);
             else {
                 PyErr_SetString(PyExc_TypeError, "Invalid type for matrix initialization. Must be int or float");
                 return NULL;
             }
+        }
+    }
+
+    return (PyObject *) matrixNewC(matrixData, rows, cols, 0);
+}
+
+static PyObject *matrixFromData1D(MatrixCoreObject *self, PyObject *args) {
+    PyObject *matrix;
+    double *matrixData;
+    long int rows = -1;
+    long int cols = -1;
+
+    if (!PyArg_ParseTuple(args, "Oll", &matrix, &rows, &cols))
+        return NULL;
+
+    if (rows < 0 || cols < 0)
+        return NULL;
+
+    matrixData = allocateMemory(rows * cols);
+
+    if (!matrixData) {
+        return NULL;
+    }
+
+    for (long int i = 0; i < rows * cols; i++) {
+        PyObject *element;
+        element = PyList_GetItem(matrix, i);
+
+        if (PyFloat_Check(element))
+            matrixData[i] = PyFloat_AsDouble(element);
+        else if (PyLong_Check(element))
+            matrixData[i] = PyLong_AsDouble(element);
+        else {
+            PyErr_SetString(PyExc_TypeError, "Invalid type for matrix initialization. Must be int or float");
+            return NULL;
         }
     }
 
@@ -304,15 +361,17 @@ static PyGetSetDef matrixGetSet[] = {
 };
 
 static PyMethodDef matrixMethods[] = {
-        {"get",      (PyCFunction) matrixGetVal,   METH_VARARGS, "Set a value in the matrix"},
-        {"set",      (PyCFunction) matrixSetVal,   METH_VARARGS, "Get a value in the matrix"},
-        {"toString", (PyCFunction) matrixToString, METH_NOARGS,  "Give the matrix object as a string"},
-        {"copy",     (PyCFunction) matrixCopy,     METH_NOARGS, "Return an exact copy of a matrix"},
+        {"get",            (PyCFunction) matrixGetVal,         METH_VARARGS, "Set a value in the matrix"},
+        {"set",            (PyCFunction) matrixSetVal,         METH_VARARGS, "Get a value in the matrix"},
+        {"toString",       (PyCFunction) matrixToString,       METH_NOARGS,  "Give the matrix object as a string"},
+        {"copy",           (PyCFunction) matrixCopy,           METH_NOARGS,  "Return an exact copy of a matrix"},
+        {"transposeMagic", (PyCFunction) matrixTransposeMagic, METH_NOARGS,  "Transpose the matrix instantly by swapping the rows and colums and the row and column stride"},
         {NULL}
 };
 
 static PyMethodDef matrixFunctionMethods[] = {
-        {"matrixFromData2D", (PyCFunction) matrixFromData, METH_VARARGS, "Create a new matrix from a 2D list of data"},
+        {"matrixFromData2D", (PyCFunction) matrixFromData2D, METH_VARARGS, "Create a new matrix from a 2D list of data"},
+        {"matrixFromData1D", (PyCFunction) matrixFromData1D, METH_VARARGS, "Create a new matrix from a 1D list of data"},
         {NULL}
 };
 

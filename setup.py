@@ -33,7 +33,7 @@ except ImportError:
 
 this_directory = Path(__file__).parent
 long_description = (this_directory / 'README.md').read_text(encoding='utf-8')
-compiler_flags = ["-std=c99"]
+compiler_flags = ["-std=c99", "-O3", "-mavx", "-m64", "-fopenmp"]
 
 ext_modules = [
     Extension(
@@ -50,7 +50,7 @@ ext_modules = [
 
 setup(
     name="libpymath",
-    version="0.0.23",
+    version="0.0.24",
     description="A general purpose Python math module",
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -62,6 +62,7 @@ setup(
     license="MIT Licences",
     keywords=["math", "matrix", "vector", "network", "neural network",
     		  "libpymath", "pymath", "libmath", "progress bar", "progress"],
+    install_requires=[],
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
         "Intended Audience :: Developers",

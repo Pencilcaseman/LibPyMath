@@ -6,7 +6,7 @@
 [![Downloads per month](https://img.shields.io/pypi/dm/libpymath.svg)](https://pypi.python.org/pypi/libpymath/)
 
 # LibPyMath
-### A fast, general purpose Python library
+### A fast, general purpose Python math library
 ---
 
 ## Install

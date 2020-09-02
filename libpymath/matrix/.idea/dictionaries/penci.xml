@@ -2,6 +2,7 @@
   <dictionary name="penci">
     <words>
       <w>dtype</w>
+      <w>libpymath</w>
     </words>
   </dictionary>
 </component>
