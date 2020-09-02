@@ -20,6 +20,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 from pathlib import Path
+import platform
 
 try:
     from setuptools import setup, Extension, find_packages
@@ -33,7 +34,7 @@ except ImportError:
 
 this_directory = Path(__file__).parent
 long_description = (this_directory / 'README.md').read_text(encoding='utf-8')
-compiler_flags = ["-std=c99", "-O3", "-mavx", "-m64", "-fopenmp"]
+compiler_flags = ["-std=c99", "-O3", "-mavx", "-fopenmp" if platform.system() in ("Linux", "Windows") else ""]
 
 ext_modules = [
     Extension(
@@ -50,7 +51,7 @@ ext_modules = [
 
 setup(
     name="libpymath",
-    version="0.0.24",
+    version="0.0.25",
     description="A general purpose Python math module",
     long_description=long_description,
     long_description_content_type='text/markdown',
