@@ -22,117 +22,129 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 from libpymath.core import matrix as _matrix
 
 
-def _internalGet(i, j, r, c):
-    return j * c + i * r
-
-
 class Matrix:
-    def __init__(self, rows=None, cols=None, data=None, dtype="float64"):
-        self.matrix = None
-        self._rows = None
-        self._cols = None
-        self._rowStride = None
-        self._colStride = None
-        self.dtype = None
-
-        if dtype is not None:
-            if dtype in ("float64", "float32", "int64", "int32", "int16"):
-                self.dtype = dtype
-            else:
-                raise Exception("Matrix datatype is not valid") from TypeError
+    def __init__(self, rows=None, cols=None, data=None, dtype="float64", internal_new=False):
+        if internal_new:
+            self.matrix = None
+            self._rows = None
+            self._cols = None
+            self._rowStride = None
+            self._colStride = None
+            self.dtype = None
         else:
-            raise Exception("Matrix datatype must not be None") from TypeError
+            self.matrix = None
+            self._rows = None
+            self._cols = None
+            self._rowStride = None
+            self._colStride = None
+            self.dtype = None
 
-        if data is not None:
-            # Create matrix from array
+            if dtype is not None:
+                if dtype in ("float64", "float32", "int64", "int32", "int16"):
+                    self.dtype = dtype
+                else:
+                    raise Exception("Matrix datatype is not valid") from TypeError
+            else:
+                raise Exception("Matrix datatype must not be None") from TypeError
 
-            # Ensure data is a list with length > 0
-            if isinstance(data, list):
-                if len(data) > 0:
-                    # First check for a 2d array
-                    if isinstance(data[0], list):
-                        # List is *probably* 2d so check remaining elements
-                        dLen = len(data[0])
-                        for val in data:
-                            if isinstance(val, list):
-                                if len(val) == dLen:
-                                    # Value is a valid row
-                                    pass
+            if data is not None:
+                # Create matrix from array
+
+                # Ensure data is a list with length > 0
+                if isinstance(data, list):
+                    if len(data) > 0:
+                        # First check for a 2d array
+                        if isinstance(data[0], list):
+                            # List is *probably* 2d so check remaining elements
+                            dLen = len(data[0])
+                            for val in data:
+                                if isinstance(val, list):
+                                    if len(val) == dLen:
+                                        # Value is a valid row
+                                        pass
+                                    else:
+                                        # Row was invalid
+                                        raise Exception("Invalid matrix shape") from ValueError
                                 else:
-                                    # Row was invalid
                                     raise Exception("Invalid matrix shape") from ValueError
+                            # At this point the data is a valid 2d array of any datatype,
+                            # so while filling the matrix ensure the data is the correct
+                            # type.
+                            self._rows = len(data)
+                            self._cols = dLen
+                            self._rowStride = self._cols
+                            self._colStride = 1
+
+                            # Matrix type is based on dtype
+                            if dtype == "float64":
+                                self.matrix = _matrix.matrixFromData2D(data, self._rows, self._cols)
                             else:
-                                raise Exception("Invalid matrix shape") from ValueError
-                        # At this point the data is a valid 2d array of any datatype,
-                        # so while filling the matrix ensure the data is the correct
-                        # type.
-                        self._rows = len(data)
-                        self._cols = dLen
-                        self._rowStride = self._cols
-                        self._colStride = 1
+                                raise Exception("Invalid matrix type -- this type may not yet be supported") from TypeError
+                        elif isinstance(data[0], (float, int)):
+                            # List is *probably* a 1d array to check remaining elements
+                            if rows is None:
+                                # Matrix is 1 x ? or 1 x cols
+                                if cols is None:
+                                    self._rows = 1
+                                    self._cols = len(data)
+                                    self._rowStride = self._cols
+                                    self._colStride = 1
+                                else:
+                                    if cols != len(data):
+                                        raise Exception("Invalid number of columns for matrix") from TypeError
 
-                        # Matrix type is based on dtype
-                        if dtype == "float64":
-                            self.matrix = _matrix.matrixFromData2D(data, self._rows, self._cols)
-                        else:
-                            raise Exception("Invalid matrix type -- this type may not yet be supported") from TypeError
-                    elif isinstance(data[0], (float, int)):
-                        # List is *probably* a 1d array to check remaining elements
-                        for val in data:
-                            if not isinstance(val, (int, float)):
-                                raise Exception("Invalid type for matrix initialization") from TypeError
+                                    self._rows = 1
+                                    self._cols = cols
+                                    self._rowStride = cols
+                                    self._colStride = 1
+                            elif rows is not None and cols is None:
+                                # Matrix is rows x 1
+                                if rows != len(data):
+                                    raise Exception("Invalid number of rows for matrix") from TypeError
 
-                        if rows is None:
-                            # Matrix is 1 x ? or 1 x cols
-                            if cols is None:
-                                self._rows = 1
-                                self._cols = len(data)
-                                self._rowStride = self._cols
+                                self._rows = rows
+                                self._cols = 1
+                                self._rowStride = 1
                                 self._colStride = 1
                             else:
-                                if cols != len(data):
-                                    raise Exception("Invalid number of columns for matrix") from TypeError
+                                # Matrix is rows x cols
+                                if rows * cols != len(data):
+                                    raise Exception("Invalid size for matrix") from TypeError
 
-                                self._rows = 1
+                                self._rows = rows
                                 self._cols = cols
                                 self._rowStride = cols
                                 self._colStride = 1
-                        elif rows is not None and cols is None:
-                            # Matrix is rows x 1
-                            if rows != len(data):
-                                raise Exception("Invalid number of rows for matrix") from TypeError
 
-                            self._rows = rows
-                            self._cols = 1
-                            self._rowStride = 1
-                            self._colStride = 1
-                        else:
-                            # Matrix is rows x cols
-                            if rows * cols != len(data):
-                                raise Exception("Invalid size for matrix") from TypeError
-
-                            self._rows = rows
-                            self._cols = cols
-                            self._rowStride = cols
-                            self._colStride = 1
-
-                        # Matrix type is based on dtype
-                        if dtype == "float64":
-                            self.matrix = _matrix.matrixFromData1D(data, self._rows, self._cols)
-                        else:
-                            raise Exception("Invalid matrix type -- this type may not yet be supported") from TypeError
+                            # Matrix type is based on dtype
+                            if dtype == "float64":
+                                self.matrix = _matrix.matrixFromData1D(data, self._rows, self._cols)
+                            else:
+                                raise Exception("Invalid matrix type -- this type may not yet be supported") from TypeError
+                    else:
+                        raise Exception("Matrix initialization data cannot have length of zero") from TypeError
                 else:
-                    raise Exception("Matrix initialization data cannot have length of zero") from TypeError
+                    raise Exception("Creating a matrix filled with a value is not yet a feature") from NotImplementedError
             else:
-                raise Exception("Creating a matrix filled with a value is not yet a feature") from NotImplementedError
-        else:
-            # Data was not given so create a matrix from rows and columns alone
-            self._rows = rows if rows is not None else 1
-            self._cols = cols if cols is not None else 1
-            self._rowStride = self._cols
-            self._colStride = 1
+                # Data was not given so create a matrix from rows and columns alone
+                self._rows = rows if rows is not None else 1
+                self._cols = cols if cols is not None else 1
+                self._rowStride = self._cols
+                self._colStride = 1
 
-            self.matrix = _matrix.Matrix(self._rows, self._cols)
+                self.matrix = _matrix.Matrix(self._rows, self._cols)
+
+    @staticmethod
+    def _internal_new(matrix, dtype="float64"):
+        res = Matrix(internal_new=True)
+        res.matrix = matrix
+        res._rows = matrix.rows
+        res._cols = matrix.cols
+        res._rowStride = matrix.rowStride
+        res._colStride = matrix.colStride
+        res.dtype = dtype
+
+        return res
 
     @property
     def rows(self):
@@ -157,13 +169,24 @@ class Matrix:
         self._rows, self._cols = self._cols, self._rows
         self.matrix.transposeMagic()
 
+    def transposed(self):
+        res = self.copy()
+        res.transpose()
+        return res
+
+    def __add__(self, other):
+        if isinstance(other, Matrix) and self._rows == other._rows and self._cols == other._cols:
+            return Matrix._internal_new(self.matrix.matrixAddMatrixReturn(other.matrix), self.dtype)
+        else:
+            raise Exception("Invalid doodle") from TypeError
+
     @property
     def T(self):
         res = self.copy()
         res.transpose()
         return res
 
-    # TODO: Make this return a vector of the relevant row -- i.e. matrix[0] -> [1, 2, 3]
+    # TO DO: Make this return a vector of the relevant row -- i.e. matrix[0] -> [1, 2, 3]
     def __getitem__(self, pos):
         if isinstance(pos, tuple):
             i, j = pos

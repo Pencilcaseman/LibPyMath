@@ -19,14 +19,12 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#define PY_SSIZE_T_CLEAN
+// #define PY_SSIZE_T_CLEAN
 
 #include <Python.h>
 #include <structmember.h>
-
-#ifdef _OPENMP
+#include "doubleFunctions.h"
 #include <omp.h>
-#endif
 
 static PyTypeObject MatrixCoreType;
 
@@ -45,6 +43,46 @@ void pythonPrint(const char *text) {
 }
 
 #define internalGet(i, j, r, c) ((j) * (c) + (i) * (r))
+
+// A routine to give access to a high precision timer on most systems.
+#if defined(_WIN32) || defined(__CYGWIN__)
+#if !defined(WIN32_LEAN_AND_MEAN)
+#define WIN32_LEAN_AND_MEAN
+#endif
+
+#include <windows.h>
+
+double seconds() {
+    LARGE_INTEGER t;
+    static double oofreq;
+    static int checkedForHighResTimer;
+    static BOOL hasHighResTimer;
+
+    if (!checkedForHighResTimer) {
+        hasHighResTimer = QueryPerformanceFrequency(&t);
+        oofreq = 1.0 / (double) t.QuadPart;
+        checkedForHighResTimer = 1;
+    }
+
+    if (hasHighResTimer) {
+        QueryPerformanceCounter(&t);
+        return (double) t.QuadPart * oofreq;
+    } else {
+        return (double) GetTickCount() * 1.0e-3;
+    }
+}
+
+#elif defined(__linux__) || defined(__APPLE__)
+#include <stddef.h>
+#include <sys/time.h>
+double seconds() {
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return (double)tv.tv_sec + (double)tv.tv_usec * 1.0e-6;
+}
+#else
+#error unsupported platform
+#endif
 
 // ****************************************************************************************************************************** //
 // ==================================================== Function Definitions ==================================================== //
@@ -87,7 +125,7 @@ static void matrixDealloc(MatrixCoreObject *self) {
     Py_TYPE(self)->tp_free((PyObject *) self);
 }
 
-static PyObject *matrixNew(PyTypeObject *type, PyObject *args, PyObject *kwds) {
+static PyObject *matrixNew(PyTypeObject *type, PyObject *args, PyObject *kwargs) {
     MatrixCoreObject *self;
     self = (MatrixCoreObject *) type->tp_alloc(type, 0);
     if (self != NULL) {
@@ -108,11 +146,10 @@ static PyObject *matrixNew(PyTypeObject *type, PyObject *args, PyObject *kwds) {
 }
 
 static int matrixInit(MatrixCoreObject *self, PyObject *args, PyObject *kwargs) {
-    static char *kwlist[] = {"rows", "cols", NULL};
     long int r = -1;
     long int c = -1;
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "l|l", kwlist, &r, &c))
+    if (!PyArg_ParseTuple(args, "ll", &r, &c))
         return -1;
 
     if (r == -1 && c == -1) {
@@ -190,6 +227,7 @@ static PyObject *matrixSetVal(MatrixCoreObject *self, PyObject *index) {
 static MatrixCoreObject *matrixNewC(double *data, long int rows, long int cols, int t) {
     MatrixCoreObject *res;
 
+    /*
     double *resData = allocateMemory(rows * cols);
     if (resData == NULL) {
         PyErr_SetString(PyExc_MemoryError, "Out of memory");
@@ -197,15 +235,16 @@ static MatrixCoreObject *matrixNewC(double *data, long int rows, long int cols, 
     }
 
     memcpy(resData, data, sizeof(double) * rows * cols);
+     */
 
-    if (PyType_Ready(&MatrixCoreType) < 0) {
-        free(resData);
-        return NULL;
-    }
+    // if (PyType_Ready(&MatrixCoreType) < 0) {
+    // free(resData);
+    //     return NULL;
+    // }
 
     res = PyObject_New(MatrixCoreObject, &MatrixCoreType);
     if (res == NULL) {
-        free(resData);
+        // free(resData);
         return NULL;
     }
 
@@ -213,7 +252,7 @@ static MatrixCoreObject *matrixNewC(double *data, long int rows, long int cols, 
     res->cols = cols;
     res->rowStride = (t == 0) ? cols : 1;
     res->colStride = (t == 0) ? 1 : cols;
-    res->data = resData;
+    res->data = data; // resData;
 
     return res;
 }
@@ -269,6 +308,31 @@ static PyObject *matrixTransposeMagic(MatrixCoreObject *self) {
     Py_RETURN_NONE;
 }
 
+static PyObject *matrixAddMatrixReturn(MatrixCoreObject *self, PyObject *args) {
+    MatrixCoreObject *other;
+    double *resData;
+
+    // double s = omp_get_wtime();
+    if (!PyArg_ParseTuple(args, "O", &other)) {
+        return NULL;
+    }
+    // double e = omp_get_wtime();
+    // printf("Parsing: %f\n", e - s);
+
+    // s = omp_get_wtime();
+    resData = allocateMemory(self->rows * self->cols);
+    doubleMatrixAddMatrix(self->data, other->data, resData, self->rows, self->cols, self->rowStride, self->colStride, other->rowStride, other->colStride);
+    // e = omp_get_wtime();
+    // printf("Calculating: %f\n", e - s);
+
+    // s = omp_get_wtime();
+    PyObject *res = (PyObject *) matrixNewC(resData, self->rows, self->cols, self->colStride != 1);
+    // e = omp_get_wtime();
+    // printf("Result: %f\n", e - s);
+
+    return res;
+}
+
 // ************************************************************************************************************************** //
 // ==================================================== Matrix Functions ==================================================== //
 // ************************************************************************************************************************** //
@@ -296,8 +360,7 @@ static PyObject *matrixFromData2D(MatrixCoreObject *self, PyObject *args) {
         row = PyList_GetItem(matrix, i);
 
         for (long int j = 0; j < cols; j++) {
-            PyObject *element;
-            element = PyList_GetItem(row, j);
+            PyObject *element = PyList_GetItem(row, j);
 
             if (PyFloat_Check(element))
                 matrixData[internalGet(i, j, cols, 1L)] = PyFloat_AsDouble(element);
@@ -348,6 +411,17 @@ static PyObject *matrixFromData1D(MatrixCoreObject *self, PyObject *args) {
     return (PyObject *) matrixNewC(matrixData, rows, cols, 0);
 }
 
+static PyObject *matrixInternalNew(MatrixCoreObject *self, PyObject *args) {
+    MatrixCoreObject *res;
+
+    res = PyObject_New(MatrixCoreObject, &MatrixCoreType);
+    if (res == NULL) {
+        return NULL;
+    }
+
+    return (PyObject *) res;
+}
+
 // **************************************************************************************************************************** //
 // ==================================================== Module Definitions ==================================================== //
 // **************************************************************************************************************************** //
@@ -361,17 +435,19 @@ static PyGetSetDef matrixGetSet[] = {
 };
 
 static PyMethodDef matrixMethods[] = {
-        {"get",            (PyCFunction) matrixGetVal,         METH_VARARGS, "Set a value in the matrix"},
-        {"set",            (PyCFunction) matrixSetVal,         METH_VARARGS, "Get a value in the matrix"},
-        {"toString",       (PyCFunction) matrixToString,       METH_NOARGS,  "Give the matrix object as a string"},
-        {"copy",           (PyCFunction) matrixCopy,           METH_NOARGS,  "Return an exact copy of a matrix"},
-        {"transposeMagic", (PyCFunction) matrixTransposeMagic, METH_NOARGS,  "Transpose the matrix instantly by swapping the rows and colums and the row and column stride"},
+        {"get",                   (PyCFunction) matrixGetVal,          METH_VARARGS, "Set a value in the matrix"},
+        {"set",                   (PyCFunction) matrixSetVal,          METH_VARARGS, "Get a value in the matrix"},
+        {"toString",              (PyCFunction) matrixToString,        METH_NOARGS,  "Give the matrix object as a string"},
+        {"copy",                  (PyCFunction) matrixCopy,            METH_NOARGS,  "Return an exact copy of a matrix"},
+        {"transposeMagic",        (PyCFunction) matrixTransposeMagic,  METH_NOARGS,  "Transpose the matrix instantly by swapping the rows and columns and the row and column stride"},
+        {"matrixAddMatrixReturn", (PyCFunction) matrixAddMatrixReturn, METH_VARARGS, "Add one matrix to another and return the result"},
         {NULL}
 };
 
 static PyMethodDef matrixFunctionMethods[] = {
-        {"matrixFromData2D", (PyCFunction) matrixFromData2D, METH_VARARGS, "Create a new matrix from a 2D list of data"},
-        {"matrixFromData1D", (PyCFunction) matrixFromData1D, METH_VARARGS, "Create a new matrix from a 1D list of data"},
+        {"matrixFromData2D",  (PyCFunction) matrixFromData2D,  METH_VARARGS, "Create a new matrix from a 2D list of data"},
+        {"matrixFromData1D",  (PyCFunction) matrixFromData1D,  METH_VARARGS, "Create a new matrix from a 1D list of data"},
+        {"matrixInternalNew", (PyCFunction) matrixInternalNew, METH_VARARGS, "Create an empty matrix"},
         {NULL}
 };
 

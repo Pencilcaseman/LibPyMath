@@ -5,10 +5,10 @@ libpymath.egg-info/PKG-INFO
 libpymath.egg-info/SOURCES.txt
 libpymath.egg-info/dependency_links.txt
 libpymath.egg-info/top_level.txt
-libpymath/LibPyMathModules/matrixModule.c
 libpymath/LibPyMathModules/testModule.c
-libpymath/LibPyMathModules/matrixModule.c
+libpymath/LibPyMathModules/matrix/matrixModule.c
 libpymath/LibPyMathModules/testModule.c
+libpymath/LibPyMathModules/matrix/matrixModule.c
 libpymath/matrix/__init__.py
 libpymath/matrix/matrix.py
 libpymath/testModule/__init__.py

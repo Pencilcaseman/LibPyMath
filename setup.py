@@ -34,7 +34,9 @@ except ImportError:
 
 this_directory = Path(__file__).parent
 long_description = (this_directory / 'README.md').read_text(encoding='utf-8')
-compiler_flags = ["-std=c99", "-O3", "-mavx", "-fopenmp" if platform.system() in ("Linux", "Windows") else ""]
+compiler_flags = ["-std=c99", "-O3", "-mavx", "-m64" if platform.system() != "Linux" else "", "-fopenmp" if platform.system() in ("Linux", "Windows") else ""]
+
+print(compiler_flags)
 
 ext_modules = [
     Extension(
@@ -44,14 +46,14 @@ ext_modules = [
     ),
     Extension(
         "libpymath.core.matrix",
-        ["libpymath/LibPyMathModules/matrixModule.c"],
+        ["libpymath/LibPyMathModules/matrix/matrixModule.c"],
         extra_compile_args=compiler_flags
     )
 ]
 
 setup(
     name="libpymath",
-    version="0.0.25",
+    version="0.0.26",
     description="A general purpose Python math module",
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -70,10 +72,6 @@ setup(
         "Intended Audience :: Education",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 3.1",
-        "Programming Language :: Python :: 3.2",
-        "Programming Language :: Python :: 3.3",
-        "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",

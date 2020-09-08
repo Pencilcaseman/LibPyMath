@@ -3,6 +3,6 @@ project(LibPyMathModules C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(LibPyMathModules main.c)
+add_executable(LibPyMathModules main.c matrix/doubleFunctions.h)
 
-include_directories(../../../../../../AppData/Local/Programs/Python/Python38/include)
+include_directories(../../../../../../../penci/anaconda3/pkgs/python-3.8.3-he1778fa_2/include)
