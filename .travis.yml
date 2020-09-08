@@ -11,6 +11,9 @@ jobs:
   include:
     - services: docker
     - os: osx
+      before_install:
+        - brew install llvm libomp
+        - export CPP=/usr/local/opt/llvm/bin/clang
       language: generic
       env: MACOSX_DEPLOYMENT_TARGET=10.9
     - os: windows
