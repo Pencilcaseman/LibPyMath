@@ -62,6 +62,10 @@ def compilerName():
 this_directory = Path(__file__).parent
 long_description = (this_directory / 'README.md').read_text(encoding='utf-8')
 
+def setCompiler():
+	if platform.system() == "Darwin":
+		os.environ["CC"] = "g++-4.7" os.environ["CXX"] = "g++-4.7"
+
 def stdCompile():
 	c = compilerName()
 	if c == "msvc":
@@ -166,6 +170,8 @@ ext_modules = [
         include_dirs=["./"]
     )
 ]
+
+setCompiler()
 
 setup(
     name="libpymath",
