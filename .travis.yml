@@ -7,28 +7,14 @@ env:
     - CIBW_MANYLINUX_X86_64_IMAGE=manylinux1
     - CIBW_MANYLINUX_I686_IMAGE=manylinux1
     - TWINE_USERNAME=__token__
-
-addons:
-  homebrew:
-    packages: gcc
-
 jobs:
   include:
     - services: docker
     - os: osx
-      # - addons:
-      #   - homebrew:
-      #     - packages:
-      #       - gcc
       before_install:
-        # - brew install llvm libomp
-        # - export CXX=/usr/local/opt/llvm/bin/clang++
-        # - export CC=/usr/local/opt/llvm/bin/clang
-        # - brew update
-        # - brew install gcc || brew link --overwrite gcc
-        # - brew upgrade --verbose
-        - export CC=gcc
-        - export CXX=g++
+        - brew install llvm
+        - C=/usr/local/opt/llvm/bin/clang
+        - CXX=/usr/local/opt/llvm/bin/clang++
       language: generic
       env: MACOSX_DEPLOYMENT_TARGET=10.9
     - os: windows
