@@ -75,30 +75,36 @@ def stdCompile():
 	return ""
 
 def openmpCompile():
+	if platform.system() == "Darwin":
+		return ""
+
 	c = compilerName()
 	if c == "msvc":
 		return "/openmp"
 	elif c in ("gcc", "g++"):
 		return "-fopenmp"
 	elif c == "clang":
-		return ""
+		return "-fopenmp"
 	elif c == "unix":
 		return "-fopenmp"
 	return ""
 
 def fpicCompile():
+	if platform.system() == "Darwin":
+		return ""
+	
 	c = compilerName()
 	if c == "msvc":
 		return ""
 	elif c in ("gcc", "g++"):
 		return "-fpic"
 	elif c == "clang":
-		return ""
+		return "-fpic"
 	elif c == "unix":
 		return "-fpic"
 	return ""
 
-def o3Compile():
+def o3Compile():	
 	c = compilerName()
 	if c == "msvc":
 		return "/O3"
@@ -134,6 +140,9 @@ def m64Compile():
 	return ""
 
 def lgompLink():
+	if platform.system() == "Darwin":
+		return ""
+	
 	c = compilerName()
 	if c == "mvcc":
 		return "-lgomp"
@@ -142,7 +151,7 @@ def lgompLink():
 	elif c == "unix":
 		return "-lgomp"
 	elif c == "clang":
-		return ""
+		return "-lgomp"
 	return ""
 
 
