@@ -15,7 +15,9 @@ jobs:
         # - brew install llvm libomp
         # - export CXX=/usr/local/opt/llvm/bin/clang++
         # - export CC=/usr/local/opt/llvm/bin/clang
-        - brew install gcc && CC=gcc-7 && CXX=g++-7
+        - brew install gcc
+        - export CC=gcc
+        - export CXX=g++
       language: generic
       env: MACOSX_DEPLOYMENT_TARGET=10.9
     - os: windows
