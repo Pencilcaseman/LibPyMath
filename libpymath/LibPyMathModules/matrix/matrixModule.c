@@ -328,6 +328,57 @@ static PyObject *matrixAddMatrixReturn(MatrixCoreObject *self, PyObject *args) {
     return res;
 }
 
+static PyObject *matrixSubMatrixReturn(MatrixCoreObject *self, PyObject *args) {
+    MatrixCoreObject *other;
+    double *resData;
+    int threads = 8;
+
+    if (!PyArg_ParseTuple(args, "O|i", &other, &threads)) {
+        return NULL;
+    }
+
+    resData = allocateMemory(self->rows * self->cols);
+    doubleMatrixSubMatrix(self->data, other->data, resData, self->rows, self->cols, self->rowStride, self->colStride, other->rowStride, other->colStride, threads);
+
+    PyObject *res = (PyObject *) matrixNewC(resData, self->rows, self->cols, self->colStride != 1);
+
+    return res;
+}
+
+static PyObject *matrixMulMatrixReturn(MatrixCoreObject *self, PyObject *args) {
+    MatrixCoreObject *other;
+    double *resData;
+    int threads = 8;
+
+    if (!PyArg_ParseTuple(args, "O|i", &other, &threads)) {
+        return NULL;
+    }
+
+    resData = allocateMemory(self->rows * self->cols);
+    doubleMatrixMulMatrix(self->data, other->data, resData, self->rows, self->cols, self->rowStride, self->colStride, other->rowStride, other->colStride, threads);
+
+    PyObject *res = (PyObject *) matrixNewC(resData, self->rows, self->cols, self->colStride != 1);
+
+    return res;
+}
+
+static PyObject *matrixDivMatrixReturn(MatrixCoreObject *self, PyObject *args) {
+    MatrixCoreObject *other;
+    double *resData;
+    int threads = 8;
+
+    if (!PyArg_ParseTuple(args, "O|i", &other, &threads)) {
+        return NULL;
+    }
+
+    resData = allocateMemory(self->rows * self->cols);
+    doubleMatrixDivMatrix(self->data, other->data, resData, self->rows, self->cols, self->rowStride, self->colStride, other->rowStride, other->colStride, threads);
+
+    PyObject *res = (PyObject *) matrixNewC(resData, self->rows, self->cols, self->colStride != 1);
+
+    return res;
+}
+
 // ************************************************************************************************************************** //
 // ==================================================== Matrix Functions ==================================================== //
 // ************************************************************************************************************************** //
@@ -406,17 +457,6 @@ static PyObject *matrixFromData1D(MatrixCoreObject *self, PyObject *args) {
     return (PyObject *) matrixNewC(matrixData, rows, cols, 0);
 }
 
-static PyObject *matrixInternalNew(MatrixCoreObject *self, PyObject *args) {
-    MatrixCoreObject *res;
-
-    res = PyObject_New(MatrixCoreObject, &MatrixCoreType);
-    if (res == NULL) {
-        return NULL;
-    }
-
-    return (PyObject *) res;
-}
-
 // **************************************************************************************************************************** //
 // ==================================================== Module Definitions ==================================================== //
 // **************************************************************************************************************************** //
@@ -436,13 +476,15 @@ static PyMethodDef matrixMethods[] = {
         {"copy",                  (PyCFunction) matrixCopy,            METH_NOARGS,  "Return an exact copy of a matrix"},
         {"transposeMagic",        (PyCFunction) matrixTransposeMagic,  METH_NOARGS,  "Transpose the matrix instantly by swapping the rows and columns and the row and column stride"},
         {"matrixAddMatrixReturn", (PyCFunction) matrixAddMatrixReturn, METH_VARARGS, "Add one matrix to another and return the result"},
+        {"matrixSubMatrixReturn", (PyCFunction) matrixSubMatrixReturn, METH_VARARGS, "Subtract one matrix from another and return the result"},
+        {"matrixMulMatrixReturn", (PyCFunction) matrixMulMatrixReturn, METH_VARARGS, "Multiply one matrix by another and return the result"},
+        {"matrixDivMatrixReturn", (PyCFunction) matrixDivMatrixReturn, METH_VARARGS, "Divide one matrix by another and return the result"},
         {NULL}
 };
 
 static PyMethodDef matrixFunctionMethods[] = {
-        {"matrixFromData2D",  (PyCFunction) matrixFromData2D,  METH_VARARGS, "Create a new matrix from a 2D list of data"},
-        {"matrixFromData1D",  (PyCFunction) matrixFromData1D,  METH_VARARGS, "Create a new matrix from a 1D list of data"},
-        {"matrixInternalNew", (PyCFunction) matrixInternalNew, METH_VARARGS, "Create an empty matrix"},
+        {"matrixFromData2D", (PyCFunction) matrixFromData2D, METH_VARARGS, "Create a new matrix from a 2D list of data"},
+        {"matrixFromData1D", (PyCFunction) matrixFromData1D, METH_VARARGS, "Create a new matrix from a 1D list of data"},
         {NULL}
 };
 

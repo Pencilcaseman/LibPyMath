@@ -23,6 +23,8 @@ import libpymath.core.matrix as _matrix
 import sys
 import os
 
+from time import time
+
 
 lpmThreads = 4
 try:
@@ -229,6 +231,27 @@ class Matrix:
             return Matrix._internal_new(self.matrix.matrixAddMatrixReturn(other.matrix, self.threads), self.dtype, self.threads)
         else:
             raise Exception("Invalid matrix size for matrix addition") from TypeError
+
+    def __sub__(self, other):
+        if isinstance(other, Matrix) and self._rows == other._rows and self._cols == other._cols:
+            _checkThreads()
+            return Matrix._internal_new(self.matrix.matrixSubMatrixReturn(other.matrix, self.threads), self.dtype, self.threads)
+        else:
+            raise Exception("Invalid matrix size for matrix subtraction") from TypeError
+
+    def __mul__(self, other):
+        if isinstance(other, Matrix) and self._rows == other._rows and self._cols == other._cols:
+            _checkThreads()
+            return Matrix._internal_new(self.matrix.matrixMulMatrixReturn(other.matrix, self.threads), self.dtype, self.threads)
+        else:
+            raise Exception("Invalid matrix size for matrix multiplication") from TypeError
+
+    def __truediv__(self, other):
+        if isinstance(other, Matrix) and self._rows == other._rows and self._cols == other._cols:
+            _checkThreads()
+            return Matrix._internal_new(self.matrix.matrixDivMatrixReturn(other.matrix, self.threads), self.dtype, self.threads)
+        else:
+            raise Exception("Invalid matrix size for matrix division") from TypeError
 
     @property
     def T(self):
