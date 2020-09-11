@@ -15,9 +15,9 @@ jobs:
         # - brew install llvm libomp
         # - export CXX=/usr/local/opt/llvm/bin/clang++
         # - export CC=/usr/local/opt/llvm/bin/clang
-        - brew update
-        - brew install gcc || brew link --overwrite gcc
-        - brew upgrade
+        # - brew update
+        # - brew install gcc || brew link --overwrite gcc
+        # - brew upgrade --verbose
         - export CC=gcc
         - export CXX=g++
       language: generic
