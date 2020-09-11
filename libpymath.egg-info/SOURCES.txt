@@ -7,7 +7,10 @@ libpymath.egg-info/dependency_links.txt
 libpymath.egg-info/top_level.txt
 libpymath/LibPyMathModules/testModule.c
 libpymath/LibPyMathModules/matrix/matrixModule.c
+libpymath/LibPyMathModules/__init__.py
 libpymath/LibPyMathModules/testModule.c
+libpymath/LibPyMathModules/matrix/__init__.py
+libpymath/LibPyMathModules/matrix/doubleFunctions.h
 libpymath/LibPyMathModules/matrix/matrixModule.c
 libpymath/matrix/__init__.py
 libpymath/matrix/matrix.py

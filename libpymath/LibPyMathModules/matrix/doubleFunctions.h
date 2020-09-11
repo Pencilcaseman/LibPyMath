@@ -5,7 +5,9 @@
 #ifndef LIBPYMATHMODULES_DOUBLEFUNCTIONS_H
 #define LIBPYMATHMODULES_DOUBLEFUNCTIONS_H
 
+#ifdef _OPENMP
 #include <omp.h>
+#endif
 
 #define internalGet(i, j, r, c) ((j) * (c) + (i) * (r))
 
@@ -26,7 +28,7 @@ void doubleMatrixAddMatrix(const double *a, const double *b, double *c, long lon
         }
     } else {
         long long i, j;
-#		pragma omp parallel for private(i, j) shared(a, b, c, rows, cols, rowStrideA, colStrideA, rowStrideB, colStrideB) num_threads(4)
+#		pragma omp parallel for private(i, j) shared(a, b, c, rows, cols, rowStrideA, colStrideA, rowStrideB, colStrideB) num_threads(8)
         for (i = 0; i < rows; i++) {
             for (j = 0; j < cols - 3; j += 4) {
                 c[j + i * cols] = a[internalGet(i, j, rowStrideA, colStrideA)] + b[internalGet(i, j, rowStrideB, colStrideB)];

@@ -21,6 +21,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 from pathlib import Path
 import platform
+import os
+import sys
 
 try:
     from setuptools import setup, Extension, find_packages
@@ -32,11 +34,116 @@ except ImportError:
                 for (folder, _, fils) in os.walk(where)
                 if "__init__.py" in fils]
 
+
+def compilerName():
+  import re
+  import distutils.ccompiler
+  comp = distutils.ccompiler.get_default_compiler()
+  getnext = False
+
+  for a in sys.argv[2:]:
+    if getnext:
+      comp = a
+      getnext = False
+      continue
+    #separated by space
+    if a == '--compiler'  or  re.search('^-[a-z]*c$', a):
+      getnext = True
+      continue
+    #without space
+    m = re.search('^--compiler=(.+)', a)
+    if m == None:
+      m = re.search('^-[a-z]*c(.+)', a)
+    if m:
+      comp = m.group(1)
+
+  return comp
+
 this_directory = Path(__file__).parent
 long_description = (this_directory / 'README.md').read_text(encoding='utf-8')
-compiler_flags = ["-std=c99", "-O3", "-mavx", "-m64" if platform.system() != "Linux" else "", "-fopenmp" if platform.system() in ("Linux", "Windows") else ""]
 
-print(compiler_flags)
+def stdCompile():
+	c = compilerName()
+	if c == "msvc":
+		return ""
+	elif c in ("gcc", "g++"):
+		return "-std=c99"
+	elif c == "clang":
+		return "-std=c99"
+	elif c == "unix":
+		return "-std=c99"
+	else:
+		return ""
+
+def openmpCompile():
+	c = compilerName()
+	if c == "msvc":
+		return "/openmp"
+	elif c in ("gcc", "g++"):
+		return "-fopenmp"
+	elif c == "clang":
+		return "-fopenmp"
+	elif c == "unix":
+		return "-fopenmp"
+	else:
+		return ""
+
+def fpicCompile():
+	c = compilerName()
+	if c == "msvc":
+		return ""
+	elif c in ("gcc", "g++"):
+		return "-fpic"
+	elif c == "clang":
+		return "-fpic"
+	elif c == "unix":
+		return "-fpic"
+	else:
+		return ""
+
+def o3Compile():
+	c = compilerName()
+	if c == "msvc":
+		return "/O3"
+	elif c in ("gcc", "g++"):
+		return "-O3"
+	elif c == "clang":
+		return "-O3"
+	elif c == "unix":
+		return "-O3"
+	else:
+		return ""
+
+def mavxCompile():
+	c = compilerName()
+	if c == "msvc":
+		return ""
+	elif c in ("gcc", "g++"):
+		return "-mavx"
+	elif c == "clang":
+		return "-mavx"
+	elif c == "unix":
+		return "-mavx"
+	else:
+		return ""
+
+def m64Compile():
+	if platform.system() != "Linux":
+		c = compilerName()
+		if c == "msvc":
+			return ""
+		elif c in ("gcc", "g++"):
+			return "-m64"
+		elif c == "clang":
+			return "-m64"
+		else:
+			return ""
+	else:
+		return ""
+
+
+compiler_flags = [stdCompile(), openmpCompile(), fpicCompile(), o3Compile(), mavxCompile()]
+macros = []
 
 ext_modules = [
     Extension(
@@ -47,13 +154,16 @@ ext_modules = [
     Extension(
         "libpymath.core.matrix",
         ["libpymath/LibPyMathModules/matrix/matrixModule.c"],
-        extra_compile_args=compiler_flags
+        extra_compile_args=compiler_flags,
+        extra_link_args=["-lgomp"],
+        define_macros=macros,
+        include_dirs=["./"]
     )
 ]
 
 setup(
     name="libpymath",
-    version="0.0.26",
+    version="0.0.61",
     description="A general purpose Python math module",
     long_description=long_description,
     long_description_content_type='text/markdown',

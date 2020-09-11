@@ -23,8 +23,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include <Python.h>
 #include <structmember.h>
-#include "doubleFunctions.h"
+#include <libpymath/LibPyMathModules/matrix/doubleFunctions.h>
+
+#ifdef _OPENMP
 #include <omp.h>
+#endif
 
 static PyTypeObject MatrixCoreType;
 
@@ -312,23 +315,14 @@ static PyObject *matrixAddMatrixReturn(MatrixCoreObject *self, PyObject *args) {
     MatrixCoreObject *other;
     double *resData;
 
-    // double s = omp_get_wtime();
     if (!PyArg_ParseTuple(args, "O", &other)) {
         return NULL;
     }
-    // double e = omp_get_wtime();
-    // printf("Parsing: %f\n", e - s);
 
-    // s = omp_get_wtime();
     resData = allocateMemory(self->rows * self->cols);
     doubleMatrixAddMatrix(self->data, other->data, resData, self->rows, self->cols, self->rowStride, self->colStride, other->rowStride, other->colStride);
-    // e = omp_get_wtime();
-    // printf("Calculating: %f\n", e - s);
 
-    // s = omp_get_wtime();
     PyObject *res = (PyObject *) matrixNewC(resData, self->rows, self->cols, self->colStride != 1);
-    // e = omp_get_wtime();
-    // printf("Result: %f\n", e - s);
 
     return res;
 }
