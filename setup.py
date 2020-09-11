@@ -62,12 +62,6 @@ def compilerName():
 this_directory = Path(__file__).parent
 long_description = (this_directory / 'README.md').read_text(encoding='utf-8')
 
-def setCompiler():
-	print(platform.system())
-	if platform.system() == "Darwin":
-		os.environ["CC"] = "/usr/bin/gcc-4.8"
-		os.environ["CXX"] = "/usr/bin/gcc-4.8"
-
 def stdCompile():
 	c = compilerName()
 	if c == "msvc":
@@ -173,11 +167,9 @@ ext_modules = [
     )
 ]
 
-setCompiler()
-
 setup(
     name="libpymath",
-    version="0.0.66",
+    version="0.0.67",
     description="A general purpose Python math module",
     long_description=long_description,
     long_description_content_type='text/markdown',
