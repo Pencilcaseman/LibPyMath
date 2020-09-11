@@ -12,9 +12,10 @@ jobs:
     - services: docker
     - os: osx
       before_install:
-        - brew install llvm libomp
-        - export CXX=/usr/local/opt/llvm/bin/clang++
-        - export CC=/usr/local/opt/llvm/bin/clang
+        # - brew install llvm libomp
+        # - export CXX=/usr/local/opt/llvm/bin/clang++
+        # - export CC=/usr/local/opt/llvm/bin/clang
+        - brew install gcc && CC=gcc-7 && CXX=g++-7
       language: generic
       env: MACOSX_DEPLOYMENT_TARGET=10.9
     - os: windows
