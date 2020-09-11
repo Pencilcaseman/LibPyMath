@@ -12,7 +12,7 @@ jobs:
     - services: docker
     - os: osx
       before_install:
-        - brew install llvm
+        # - brew install llvm
         - alias gcc='gcc-4.8'
         - alias cc='gcc-4.8'
         - alias g++='g++-4.8'
