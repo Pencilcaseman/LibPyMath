@@ -65,9 +65,8 @@ long_description = (this_directory / 'README.md').read_text(encoding='utf-8')
 def setCompiler():
 	print(platform.system())
 	if platform.system() == "Darwin":
-		os.environ["CC"] = "gcc"
-		os.environ["C"] = "gcc"
-		os.environ["CXX"] = "g++"
+		os.environ["CC"] = "gcc-4.8"
+		os.environ["CXX"] = "gcc-4.8"
 
 def stdCompile():
 	c = compilerName()
