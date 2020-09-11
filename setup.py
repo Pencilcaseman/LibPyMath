@@ -133,21 +133,33 @@ def m64Compile():
 			return "-m64"
 	return ""
 
+def lgompLink():
+	c = compilerName()
+	if c == "mvcc":
+		return "-lgomp"
+	elif c in ("gcc", "g++"):
+		return "-lgomp"
+	elif c == "clang":
+		return ""
+	return ""
+
 
 compiler_flags = [stdCompile(), openmpCompile(), fpicCompile(), o3Compile(), mavxCompile()]
+link_args = [lgompLink]
 macros = []
 
 ext_modules = [
     Extension(
         "libpymath.core.testModule",
         ["libpymath/LibPyMathModules/testModule.c"],
-        extra_compile_args=compiler_flags
+        extra_compile_args=compiler_flags,
+        extra_link_args=link_args
     ),
     Extension(
         "libpymath.core.matrix",
         ["libpymath/LibPyMathModules/matrix/matrixModule.c"],
         extra_compile_args=compiler_flags,
-        extra_link_args=["-lgomp"],
+        extra_link_args=link_args,
         define_macros=macros,
         include_dirs=["./"]
     )
@@ -155,7 +167,7 @@ ext_modules = [
 
 setup(
     name="libpymath",
-    version="0.0.62",
+    version="0.0.63",
     description="A general purpose Python math module",
     long_description=long_description,
     long_description_content_type='text/markdown',
