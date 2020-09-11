@@ -87,7 +87,7 @@ def openmpCompile():
 	elif c in ("gcc", "g++"):
 		return "-fopenmp"
 	elif c == "clang":
-		return "-fopenmp"
+		return ""
 	elif c == "unix":
 		return "-fopenmp"
 	return ""
@@ -99,7 +99,7 @@ def fpicCompile():
 	elif c in ("gcc", "g++"):
 		return "-fpic"
 	elif c == "clang":
-		return "-fpic"
+		return ""
 	elif c == "unix":
 		return "-fpic"
 	return ""

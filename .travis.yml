@@ -2,7 +2,6 @@ language: python
 os: linux
 env:
   global:
-    # - CIBW_SKIP=cp34-*
     - CIBW_BUILD=cp3?-*
     - CIBW_MANYLINUX_X86_64_IMAGE=manylinux1
     - CIBW_MANYLINUX_I686_IMAGE=manylinux1
@@ -12,15 +11,6 @@ jobs:
   include:
     - services: docker
     - os: osx
-      before_install:
-        - brew install gcc@10
-        - ls /usr/bin/
-        - alias gcc='gcc-10.1'
-        - alias cc='gcc-10.1'
-        - alias g++='g++-10.1'
-        - alias c++='c++-10.1'
-        - C=/usr/local/opt/llvm/bin/clang
-        - CXX=/usr/local/opt/llvm/bin/clang++
       language: generic
       env: MACOSX_DEPLOYMENT_TARGET=10.9
     - os: windows
