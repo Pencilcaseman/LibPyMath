@@ -66,6 +66,7 @@ def setCompiler():
 	print(platform.system())
 	if platform.system() == "Darwin":
 		os.environ["CC"] = "gcc"
+		os.environ["C"] = "gcc"
 		os.environ["CXX"] = "g++"
 
 def stdCompile():
