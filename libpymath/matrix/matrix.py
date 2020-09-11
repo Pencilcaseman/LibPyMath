@@ -20,10 +20,39 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 import libpymath.core.matrix as _matrix
+import sys
+import os
+
+
+lpmThreads = 4
+try:
+    if sys.platform == 'win32':
+        lpmThreads = (int)(os.environ['NUMBER_OF_PROCESSORS'])
+    else:
+        lpmThreads = (int)(os.popen('grep -c cores /proc/cpuinfo').read())
+except:
+    print("Number of threads available unknown. Assuming 4")
+
+
+def _checkThreads():
+    global lpmThreads
+    if isinstance(lpmThreads, int):
+        if lpmThreads < 1:
+            lpmThreads = 1
+    else:
+        try:
+            if sys.platform == 'win32':
+                lpmThreads = (int)(os.environ['NUMBER_OF_PROCESSORS'])
+            else:
+                lpmThreads = (int)(os.popen('grep -c cores /proc/cpuinfo').read())
+        except:
+            print("Number of threads available unknown. Assuming 4")
 
 
 class Matrix:
-    def __init__(self, rows=None, cols=None, data=None, dtype="float64", internal_new=False):
+    def __init__(self, rows=None, cols=None, data=None, dtype="float64", threads=None, internal_new=False):
+        _checkThreads()
+
         if internal_new:
             self.matrix = None
             self._rows = None
@@ -31,6 +60,7 @@ class Matrix:
             self._rowStride = None
             self._colStride = None
             self.dtype = None
+            self._threads = lpmThreads
         else:
             self.matrix = None
             self._rows = None
@@ -38,6 +68,18 @@ class Matrix:
             self._rowStride = None
             self._colStride = None
             self.dtype = None
+            self._threads = lpmThreads
+
+            if threads is not None:
+                if isinstance(threads, int):
+                    if threads > 0:
+                        self._threads = threads
+                    else:
+                        raise Exception("Invalid number of threads. Must be >= 1") from ValueError
+                else:
+                    raise Exception("Invalid thread type. Must be of type <int>") from TypeError
+            else:
+                self._threads = lpmThreads // 2
 
             if dtype is not None:
                 if dtype in ("float64", "float32", "int64", "int32", "int16"):
@@ -135,7 +177,9 @@ class Matrix:
                 self.matrix = _matrix.Matrix(self._rows, self._cols)
 
     @staticmethod
-    def _internal_new(matrix, dtype="float64"):
+    def _internal_new(matrix, dtype="float64", threads=lpmThreads // 2):
+        _checkThreads()
+
         res = Matrix(internal_new=True)
         res.matrix = matrix
         res._rows = matrix.rows
@@ -143,6 +187,7 @@ class Matrix:
         res._rowStride = matrix.rowStride
         res._colStride = matrix.colStride
         res.dtype = dtype
+        res._threads = threads
 
         return res
 
@@ -162,6 +207,10 @@ class Matrix:
     def colStride(self):
         return self._colStride
 
+    @property
+    def threads(self):
+        return self._threads
+
     def transpose(self) -> None:
         # Swap row and column stride
         self._rowStride, self._colStride = self._colStride, self._rowStride
@@ -176,9 +225,10 @@ class Matrix:
 
     def __add__(self, other):
         if isinstance(other, Matrix) and self._rows == other._rows and self._cols == other._cols:
-            return Matrix._internal_new(self.matrix.matrixAddMatrixReturn(other.matrix), self.dtype)
+            _checkThreads()
+            return Matrix._internal_new(self.matrix.matrixAddMatrixReturn(other.matrix, self.threads), self.dtype, self.threads)
         else:
-            raise Exception("Invalid doodle") from TypeError
+            raise Exception("Invalid matrix size for matrix addition") from TypeError
 
     @property
     def T(self):
@@ -290,5 +340,6 @@ class Matrix:
         res._rowStride = self._rowStride
         res._colStride = self._colStride
         res.dtype = self.dtype
+        res._threads = self._threads
 
         return res

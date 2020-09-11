@@ -314,13 +314,14 @@ static PyObject *matrixTransposeMagic(MatrixCoreObject *self) {
 static PyObject *matrixAddMatrixReturn(MatrixCoreObject *self, PyObject *args) {
     MatrixCoreObject *other;
     double *resData;
+    int threads = 8;
 
-    if (!PyArg_ParseTuple(args, "O", &other)) {
+    if (!PyArg_ParseTuple(args, "O|i", &other, &threads)) {
         return NULL;
     }
 
     resData = allocateMemory(self->rows * self->cols);
-    doubleMatrixAddMatrix(self->data, other->data, resData, self->rows, self->cols, self->rowStride, self->colStride, other->rowStride, other->colStride);
+    doubleMatrixAddMatrix(self->data, other->data, resData, self->rows, self->cols, self->rowStride, self->colStride, other->rowStride, other->colStride, threads);
 
     PyObject *res = (PyObject *) matrixNewC(resData, self->rows, self->cols, self->colStride != 1);
 

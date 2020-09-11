@@ -72,8 +72,7 @@ def stdCompile():
 		return "-std=c99"
 	elif c == "unix":
 		return "-std=c99"
-	else:
-		return ""
+	return ""
 
 def openmpCompile():
 	c = compilerName()
@@ -85,8 +84,7 @@ def openmpCompile():
 		return "-fopenmp"
 	elif c == "unix":
 		return "-fopenmp"
-	else:
-		return ""
+	return ""
 
 def fpicCompile():
 	c = compilerName()
@@ -98,8 +96,7 @@ def fpicCompile():
 		return "-fpic"
 	elif c == "unix":
 		return "-fpic"
-	else:
-		return ""
+	return ""
 
 def o3Compile():
 	c = compilerName()
@@ -111,8 +108,7 @@ def o3Compile():
 		return "-O3"
 	elif c == "unix":
 		return "-O3"
-	else:
-		return ""
+	return ""
 
 def mavxCompile():
 	c = compilerName()
@@ -124,8 +120,7 @@ def mavxCompile():
 		return "-mavx"
 	elif c == "unix":
 		return "-mavx"
-	else:
-		return ""
+	return ""
 
 def m64Compile():
 	if platform.system() != "Linux":
@@ -136,10 +131,7 @@ def m64Compile():
 			return "-m64"
 		elif c == "clang":
 			return "-m64"
-		else:
-			return ""
-	else:
-		return ""
+	return ""
 
 
 compiler_flags = [stdCompile(), openmpCompile(), fpicCompile(), o3Compile(), mavxCompile()]
@@ -163,7 +155,7 @@ ext_modules = [
 
 setup(
     name="libpymath",
-    version="0.0.61",
+    version="0.0.62",
     description="A general purpose Python math module",
     long_description=long_description,
     long_description_content_type='text/markdown',
