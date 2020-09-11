@@ -11,6 +11,10 @@ jobs:
   include:
     - services: docker
     - os: osx
+      - addons:
+        - homebrew:
+          - packages:
+            - gcc
       before_install:
         # - brew install llvm libomp
         # - export CXX=/usr/local/opt/llvm/bin/clang++
