@@ -12,7 +12,8 @@ jobs:
     - services: docker
     - os: osx
       before_install:
-        - brew install llvm
+        # - brew install llvm
+        - clang
         - C=/usr/local/opt/llvm/bin/clang
         - CXX=/usr/local/opt/llvm/bin/clang++
       language: generic
