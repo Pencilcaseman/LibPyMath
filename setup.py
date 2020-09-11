@@ -145,7 +145,7 @@ def lgompLink():
 
 
 compiler_flags = [stdCompile(), openmpCompile(), fpicCompile(), o3Compile(), mavxCompile()]
-link_args = [lgompLink]
+link_args = [lgompLink()]
 macros = []
 
 ext_modules = [
@@ -167,7 +167,7 @@ ext_modules = [
 
 setup(
     name="libpymath",
-    version="0.0.63",
+    version="0.0.64",
     description="A general purpose Python math module",
     long_description=long_description,
     long_description_content_type='text/markdown',
