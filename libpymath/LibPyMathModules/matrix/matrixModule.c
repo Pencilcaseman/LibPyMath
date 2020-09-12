@@ -379,6 +379,27 @@ static PyObject *matrixDivMatrixReturn(MatrixCoreObject *self, PyObject *args) {
     return res;
 }
 
+static PyObject *matrixToList(MatrixCoreObject *self, PyObject *args) {
+    PyObject *res = PyList_New(self->rows);
+    if (res != NULL) {
+        for (long int i = 0; i < self->rows; i++) {
+            PyObject *row = PyList_New(self->cols);
+
+            if (row == NULL) {
+                return row;
+            }
+
+            for (long int j = 0; j < self->cols; j++) {
+                PyList_SET_ITEM(row, j, Py_BuildValue("f", self->data[internalGet(i, j, self->rowStride, self->colStride)]));
+            }
+
+            PyList_SET_ITEM(res, i, row);
+        }
+    }
+
+    return res;
+}
+
 // ************************************************************************************************************************** //
 // ==================================================== Matrix Functions ==================================================== //
 // ************************************************************************************************************************** //
@@ -479,6 +500,7 @@ static PyMethodDef matrixMethods[] = {
         {"matrixSubMatrixReturn", (PyCFunction) matrixSubMatrixReturn, METH_VARARGS, "Subtract one matrix from another and return the result"},
         {"matrixMulMatrixReturn", (PyCFunction) matrixMulMatrixReturn, METH_VARARGS, "Multiply one matrix by another and return the result"},
         {"matrixDivMatrixReturn", (PyCFunction) matrixDivMatrixReturn, METH_VARARGS, "Divide one matrix by another and return the result"},
+        {"matrixToList",          (PyCFunction) matrixToList,          METH_NOARGS,  "Return the matrix represented as a 2D python list"},
         {NULL}
 };
 

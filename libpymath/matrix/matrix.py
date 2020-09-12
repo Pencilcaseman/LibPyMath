@@ -97,6 +97,8 @@ def _checkMultiprocessing():
 
 class Matrix:
     def __init__(self, rows=None, cols=None, data=None, dtype="float64", threads=None, internal_new=False):
+        self.__safe_for_unpickling__ = True
+
         _checkMultiprocessing()
 
         if internal_new:
@@ -328,6 +330,9 @@ class Matrix:
         else:
             raise Exception("Indexing must take two values in this version of libpymath") from NotImplementedError
 
+    def toList(self):
+        return self.matrix.matrixToList()
+
     def __str__(self):
         skipRows = self._rows >= 32
         skipCols = self._cols >= 32
@@ -408,6 +413,12 @@ class Matrix:
 
     def __repr__(self):
         return str(self)
+
+    def __reduce__(self):
+        return (
+            Matrix,
+            (self._rows, self._cols, self.toList(), self.dtype, self.threads)
+        )
 
     def copy(self):
         res = Matrix(rows=1, cols=1)
