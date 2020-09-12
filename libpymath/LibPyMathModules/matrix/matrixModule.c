@@ -314,7 +314,7 @@ static PyObject *matrixTransposeMagic(MatrixCoreObject *self) {
 static PyObject *matrixAddMatrixReturn(MatrixCoreObject *self, PyObject *args) {
     MatrixCoreObject *other;
     double *resData;
-    int threads = 8;
+    int threads = 1;
 
     if (!PyArg_ParseTuple(args, "O|i", &other, &threads)) {
         return NULL;

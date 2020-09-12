@@ -34,7 +34,6 @@ except ImportError:
                 for (folder, _, fils) in os.walk(where)
                 if "__init__.py" in fils]
 
-
 def compilerName():
   import re
   import distutils.ccompiler
@@ -178,7 +177,7 @@ ext_modules = [
 
 setup(
     name="libpymath",
-    version="0.1.1",
+    version="0.1.2",
     description="A general purpose Python math module",
     long_description=long_description,
     long_description_content_type='text/markdown',
