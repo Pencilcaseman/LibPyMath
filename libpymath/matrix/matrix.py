@@ -25,7 +25,8 @@ import os
 from time import time
 
 
-lpmCores = os.cpu_count()
+# Min 4 cores for thread test purposes -- speed may increase with more cores
+lpmCores = min(os.cpu_count(), 4)
 lpmThreads = 4
 try:
     if sys.platform == 'win32':
