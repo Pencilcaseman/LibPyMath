@@ -19,88 +19,16 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
+from . import _threadSetup
+from . import _threadInfo
 import libpymath.core.matrix as _matrix
 import sys
 import os
 from time import time
 
-
-# Min 4 cores for thread test purposes -- speed may increase with more cores
-lpmCores = min(os.cpu_count(), 4)
-lpmThreads = 4
-try:
-    if sys.platform == 'win32':
-        lpmThreads = (int)(os.environ['NUMBER_OF_PROCESSORS'])
-    else:
-        lpmThreads = (int)(os.popen('grep -c cores /proc/cpuinfo').read())
-except:
-    print("Number of threads available unknown. Assuming 4")
-
-lpmHyperthreading = lpmCores != lpmThreads
-
-# Find the optimal number of threads to use
-def _optimalThreads(verbose=False):
-    if verbose:
-        print("Testing speed using {} through {} threads".format(1, lpmThreads))
-
-    fastTime = 99999999999999
-    fastThreads = 0
-
-    for i in range(1, lpmThreads + 1):
-        # Create a matrix
-        mat = _matrix.Matrix(1000, 1000)
-
-        start = time()
-        for j in range(10):
-            res = mat.matrixAddMatrixReturn(mat, i)
-        end = time()
-        dt = end - start
-
-        if verbose:
-            print("{} threads >> {} seconds".format(i, dt))
-
-        if dt < fastTime:
-            fastTime = dt
-            fastThreads = i
-
-    return fastThreads
-
-lpmDefaultThreads = _optimalThreads(verbose=False)
-
-def _checkMultiprocessing():
-    global lpmThreads
-    global lpmCores
-    global lpmDefaultThreads
-    if isinstance(lpmThreads, int):
-        if lpmThreads < 1:
-            lpmThreads = 1
-    else:
-        try:
-            if sys.platform == 'win32':
-                lpmThreads = (int)(os.environ['NUMBER_OF_PROCESSORS'])
-            else:
-                lpmThreads = (int)(os.popen('grep -c cores /proc/cpuinfo').read())
-        except:
-            print("Number of threads available unknown. Assuming 4")
-
-    if isinstance(lpmCores, int):
-        if lpmCores < 1:
-            lpmCores = 1
-    else:
-        lpmCores = os.cpu_count()
-
-    if isinstance(lpmDefaultThreads, int):
-        if lpmDefaultThreads < 1:
-            lpmDefaultThreads = 1
-    else:
-        lpmDefaultThreads = _optimalThreads()
-
-
 class Matrix:
     def __init__(self, rows=None, cols=None, data=None, dtype="float64", threads=None, internal_new=False):
         self.__safe_for_unpickling__ = True
-
-        _checkMultiprocessing()
 
         if internal_new:
             self.matrix = None
@@ -109,7 +37,7 @@ class Matrix:
             self._rowStride = None
             self._colStride = None
             self.dtype = None
-            self._threads = lpmDefaultThreads
+            self._threads = _threadInfo.LPM_OPTIMAL_MATRIX_THREADS
         else:
             self.matrix = None
             self._rows = None
@@ -128,7 +56,7 @@ class Matrix:
                 else:
                     raise Exception("Invalid thread type. Must be of type <int>") from TypeError
             else:
-                self._threads = lpmDefaultThreads
+                self._threads = _threadInfo.LPM_OPTIMAL_MATRIX_THREADS
 
             if dtype is not None:
                 if dtype in ("float64", "float32", "int64", "int32", "int16"):
@@ -226,9 +154,7 @@ class Matrix:
                 self.matrix = _matrix.Matrix(self._rows, self._cols)
 
     @staticmethod
-    def _internal_new(matrix, dtype="float64", threads=lpmDefaultThreads):
-        _checkMultiprocessing()
-
+    def _internal_new(matrix, dtype="float64", threads=_threadInfo.LPM_OPTIMAL_MATRIX_THREADS):
         res = Matrix(internal_new=True)
         res.matrix = matrix
         res._rows = matrix.rows
@@ -274,38 +200,24 @@ class Matrix:
 
     def __add__(self, other):
         if isinstance(other, Matrix) and self._rows == other._rows and self._cols == other._cols:
-            _checkMultiprocessing()
-
-            start = time()
-            tmp = self.matrix.matrixAddMatrixReturn(other.matrix, self.threads)
-            print(time() - start)
-            start = time()
-            res = Matrix._internal_new(tmp, self.dtype, self.threads)
-            print(time() - start)
-            return res
-
-            # return Matrix._internal_new(self.matrix.matrixAddMatrixReturn(other.matrix, self.threads), self.dtype, self.threads)
-
+            return Matrix._internal_new(self.matrix.matrixAddMatrixReturn(other.matrix, self.threads), self.dtype, self.threads)
         else:
             raise Exception("Invalid matrix size for matrix addition") from TypeError
 
     def __sub__(self, other):
         if isinstance(other, Matrix) and self._rows == other._rows and self._cols == other._cols:
-            _checkMultiprocessing()
             return Matrix._internal_new(self.matrix.matrixSubMatrixReturn(other.matrix, self.threads), self.dtype, self.threads)
         else:
             raise Exception("Invalid matrix size for matrix subtraction") from TypeError
 
     def __mul__(self, other):
         if isinstance(other, Matrix) and self._rows == other._rows and self._cols == other._cols:
-            _checkMultiprocessing()
             return Matrix._internal_new(self.matrix.matrixMulMatrixReturn(other.matrix, self.threads), self.dtype, self.threads)
         else:
             raise Exception("Invalid matrix size for matrix multiplication") from TypeError
 
     def __truediv__(self, other):
         if isinstance(other, Matrix) and self._rows == other._rows and self._cols == other._cols:
-            _checkMultiprocessing()
             return Matrix._internal_new(self.matrix.matrixDivMatrixReturn(other.matrix, self.threads), self.dtype, self.threads)
         else:
             raise Exception("Invalid matrix size for matrix division") from TypeError

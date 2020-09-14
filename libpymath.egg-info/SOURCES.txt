@@ -13,6 +13,8 @@ libpymath/LibPyMathModules/matrix/__init__.py
 libpymath/LibPyMathModules/matrix/doubleFunctions.h
 libpymath/LibPyMathModules/matrix/matrixModule.c
 libpymath/matrix/__init__.py
+libpymath/matrix/_threadInfo.py
+libpymath/matrix/_threadSetup.py
 libpymath/matrix/matrix.py
 libpymath/testModule/__init__.py
 libpymath/testModule/testScript.py
