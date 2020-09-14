@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: libpymath
-Version: 0.1.5
+Version: 0.1.7
 Summary: A general purpose Python math module
 Home-page: https://www.github.com/pencilcaseman/gpc
 Author: Toby Davis
@@ -14,11 +14,11 @@ Description: [![Build Status](https://travis-ci.com/Pencilcaseman/LibPyMath.svg?
         [![Downloads per month](https://img.shields.io/pypi/dm/libpymath.svg)](https://pypi.python.org/pypi/libpymath/)
         
         # LibPyMath
-        ### A fast, general purpose Python math library
+        ### A fast, general purpose math library for Python
         ---
         
         ## Install
-        Run ```pip install libpymath``` to dowload and install ```libpymath``` for your operating system and python version. There are also wheels provided for many of the latest Python versions on Windows, Mac OS and Linux thanks to the ```cibuildwheel``` project.
+        Run ```pip install libpymath``` to dowload and install ```libpymath``` for your system. There are also wheels provided for many of the latest Python versions on Windows, Mac OS* and Linux thanks to the ```cibuildwheel``` project.
         
         ---
         
@@ -26,7 +26,7 @@ Description: [![Build Status](https://travis-ci.com/Pencilcaseman/LibPyMath.svg?
         ### Matrix math
         Easily create, manipulate and perform calculations with dense matrices. The matrices themselves are stored and manipulated with optimised C code, resulting in faster operations and more efficient calculations.
         
-        The matrix library is currently very primitive and supports very few operations, though is constantly being expanded on and improved. Many ease of use features also exist, such as the ability to format and print a matrix, alligning the decimal points (if present) and providing brackets in the relevant places.
+        The matrix library is currently in its early stages and only supports elementwise addition, subtraction, division and multiplication, as well as the matrix transpose function and some ease of use functions, such as the ability to format and print a matrix, alligning the decimal points (if present) and providing brackets in the relevant places.
         
         For example, the following creates a new matrix from a 2d list of data
         ```python
@@ -88,6 +88,10 @@ Description: [![Build Status](https://travis-ci.com/Pencilcaseman/LibPyMath.svg?
              [998000.0, 998001.0, 998002.0  ***  998997.0, 998998.0, 998999.0]
              [999000.0, 999001.0, 999002.0  ***  999997.0, 999998.0, 999999.0]]
         ```
+        
+        
+        
+        \* Due to Clang on Mac OS the wheels do not support OpenMP, meaning some matrix operations may be slower than on other operating systems.
         
 Keywords: math,matrix,vector,network,neural network,libpymath,pymath,libmath,progress bar,progress
 Platform: UNKNOWN

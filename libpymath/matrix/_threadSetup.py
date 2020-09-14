@@ -4,6 +4,7 @@ import os
 from libpymath.core import matrix as _matrix
 from time import time
 import math
+import shutil
 
 # Min 4 cores for thread test purposes -- speed may increase with more cores
 LPM_CORES = min(os.cpu_count(), 4)
@@ -20,7 +21,7 @@ LPM_IS_HYPERTHREADING = LPM_CORES != LPM_THREADS
 
 # Find the optimal number of threads to use
 def _lpmFindOptimalMatrixThreads(n = 1000, verbose=False):
-    termWidth = os.get_terminal_size().columns
+    termWidth = shutil.get_terminal_size(fallback=(120, 50)).columns
 
     fastTime = 99999999999999
     fastThreads = 0
