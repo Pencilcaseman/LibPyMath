@@ -26,7 +26,7 @@ def _lpmFindOptimalMatrixThreads(n = 1000, verbose=False):
     fastTime = 99999999999999
     fastThreads = 0
 
-    for i in range(1, LPM_THREADS + 1):
+    for i in range(1, LPM_CORES * 2):
         # Create a matrix
         mat = _matrix.Matrix(1000, 1000)
 
@@ -65,7 +65,7 @@ def _lpmFindOptimalMatrixThreads(n = 1000, verbose=False):
 
 LPM_OPTIMAL_MATRIX_THREADS = _lpmFindOptimalMatrixThreads(n=500, verbose=True)
 
-printf("Using {} threads for libpymath matrix math".format(LPM_OPTIMAL_MATRIX_THREADS))
+print("Using {} threads for libpymath matrix math".format(LPM_OPTIMAL_MATRIX_THREADS))
 
 with open("_threadInfo.py", "w") as out:
     out.write("LPM_CORES = {}\n".format(LPM_CORES))
