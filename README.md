@@ -16,7 +16,7 @@ Run ```pip install libpymath``` to dowload and install ```libpymath``` for your 
 
 ## Features and usage
 ### Matrix math
-Easily create, manipulate and perform calculations with dense matrices. The matrices themselves are stored and manipulated with optimised C code, resulting in faster operations and more efficient calculations.
+Easily create, manipulate and perform calculations with dense matrices. The matrices themselves are stored and manipulated with optimised C code, resulting in faster operations and more efficient calculations. To further increase the speed of the calculations, when libpymath imported into a project for the first time, it runs some tests on the CPU to find the optimal number of threads to use for the matrix calculations.
 
 The matrix library is currently in its early stages and only supports elementwise addition, subtraction, division and multiplication, as well as the matrix transpose function and some ease of use functions, such as the ability to format and print a matrix, alligning the decimal points (if present) and providing brackets in the relevant places.
 

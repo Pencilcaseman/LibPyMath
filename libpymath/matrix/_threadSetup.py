@@ -6,29 +6,19 @@ from time import time
 import math
 import shutil
 
-# Min 4 cores for thread test purposes -- speed may increase with more cores
-LPM_CORES = min(os.cpu_count(), 4)
-LPM_THREADS = 4
-try:
-    if sys.platform == 'win32':
-        LPM_THREADS = (int)(os.environ['NUMBER_OF_PROCESSORS'])
-    else:
-        LPM_THREADS = (int)(os.popen('grep -c cores /proc/cpuinfo').read())
-except:
-    print("Number of threads available unknown. Assuming 4")
-
-LPM_IS_HYPERTHREADING = LPM_CORES != LPM_THREADS
+# Min 8 cores for thread test purposes -- speed may increase with more cores even if they do not register as present (e.g. Google Colab / Repl.it)
+LPM_CORES = max(os.cpu_count(), 8)
 
 # Find the optimal number of threads to use
-def _lpmFindOptimalMatrixThreads(n = 1000, verbose=False):
+def _lpmFindOptimalMatrixThreads(matSize=1000, n=1000, verbose=False):
     termWidth = shutil.get_terminal_size(fallback=(120, 50)).columns
 
     fastTime = 99999999999999
     fastThreads = 0
 
-    for i in range(1, LPM_CORES * 2):
+    for i in range(1, LPM_CORES + 1):
         # Create a matrix
-        mat = _matrix.Matrix(1000, 1000)
+        mat = _matrix.Matrix(matSize, matSize)
 
         dt = 0
         maxTime = 0
@@ -51,7 +41,7 @@ def _lpmFindOptimalMatrixThreads(n = 1000, verbose=False):
             inc = math.ceil(n / progLen) # n // progLen
 
             if verbose:
-                print("Testing thread {}   [{}{}]\r".format(str(i).rjust(5), "#" * math.ceil(j / inc), " " * (math.ceil(n / inc) - math.ceil(j / inc))), end="")
+                print("Testing {} threads   [{}{}]\r".format(str(i).rjust(5), "#" * math.ceil(j / inc), " " * (math.ceil(n / inc) - math.ceil(j / inc))), end="")
                 sys.stdout.flush()
 
         if dt < fastTime:
@@ -59,16 +49,21 @@ def _lpmFindOptimalMatrixThreads(n = 1000, verbose=False):
             fastThreads = i
 
     if verbose:
-        print(" ".ljust(termWidth - 5), end="")
+        print("", end=" " * (termWidth - 5) + "\r")
 
     return fastThreads
 
-LPM_OPTIMAL_MATRIX_THREADS = _lpmFindOptimalMatrixThreads(n=500, verbose=True)
+write = False
+try:
+    with open("{}/_threadInfo.py".format(os.path.dirname(os.path.realpath(__file__))), "r") as f:
+        if f.read() == "UNINITIALIZED":
+            write = True
+except FileNotFoundError:
+    write = True
 
-print("Using {} threads for libpymath matrix math".format(LPM_OPTIMAL_MATRIX_THREADS))
+if write:
+    LPM_OPTIMAL_MATRIX_THREADS = _lpmFindOptimalMatrixThreads(matSize=1500, n=250, verbose=True)
 
-with open("_threadInfo.py", "w") as out:
-    out.write("LPM_CORES = {}\n".format(LPM_CORES))
-    out.write("LPM_THREADS = {}\n".format(LPM_THREADS))
-    out.write("LPM_IS_HYPERTHREADING = {}\n".format(LPM_IS_HYPERTHREADING))
-    out.write("LPM_OPTIMAL_MATRIX_THREADS = {}\n".format(LPM_OPTIMAL_MATRIX_THREADS))
+    with open("{}/_threadInfo.py".format(os.path.dirname(os.path.realpath(__file__))), "w") as f:
+        f.write("LPM_CORES = {}\n".format(LPM_CORES))
+        f.write("LPM_OPTIMAL_MATRIX_THREADS = {}\n".format(LPM_OPTIMAL_MATRIX_THREADS))

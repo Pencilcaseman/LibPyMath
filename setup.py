@@ -58,6 +58,9 @@ def compilerName():
 
   return comp
 
+with open("{}/libpymath/matrix/_threadInfo.py".format(os.path.dirname(os.path.realpath(__file__))), "w") as out:
+    out.write("UNINITIALIZED")
+
 this_directory = Path(__file__).parent
 long_description = (this_directory / 'README.md').read_text(encoding='utf-8')
 
@@ -143,8 +146,8 @@ def lgompLink():
 		return ""
 	
 	c = compilerName()
-	if c == "mvcc":
-		return "-lgomp"
+	if c == "msvc":
+		return ""
 	elif c in ("gcc", "g++"):
 		return "-lgomp"
 	elif c == "unix":
@@ -177,7 +180,7 @@ ext_modules = [
 
 setup(
     name="libpymath",
-    version="0.1.9",
+    version="0.1.10",
     description="A general purpose Python math module",
     long_description=long_description,
     long_description_content_type='text/markdown',

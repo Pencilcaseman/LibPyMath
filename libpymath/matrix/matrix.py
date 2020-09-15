@@ -334,7 +334,7 @@ class Matrix:
         )
 
     def copy(self):
-        res = Matrix(rows=1, cols=1)
+        res = Matrix(internal_new=True)
         res.matrix = self.matrix.copy()
         res._rows = self._rows
         res._cols = self._cols
