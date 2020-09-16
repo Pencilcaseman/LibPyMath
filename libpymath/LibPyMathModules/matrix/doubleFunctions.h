@@ -1,6 +1,23 @@
-//
-// Created by penci on 04/09/2020.
-//
+/*
+Copyright 2020 Toby Davis
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
+so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
 
 #ifndef LIBPYMATHMODULES_DOUBLEFUNCTIONS_H
 #define LIBPYMATHMODULES_DOUBLEFUNCTIONS_H
@@ -157,6 +174,43 @@ void doubleMatrixDivMatrix(const double *a, const double *b, double *c, long lon
             }
         }
     }
+}
+
+void doubleMatmul(long int M, long int N, long int K, const double *a, const double *b, double *c, long int rowStrideA, long int colStrideA, long int rowStrideB, long int colStrideB, int threads) {
+    long int i, j, k;
+#   pragma omp parallel for private(i, j, k) shared(M, N, K, a, b, c, rowStrideA, colStrideA, rowStrideB, colStrideB) num_threads(threads)
+    for (i = 0; i < M; i++) {
+        for (j = 0; j < K; j++) {
+            c[j + i * K] = 0;
+            for (k = 0; k < N; k++) {
+                c[j + i * K] += a[internalGet(i, k, rowStrideA, colStrideA)] * b[internalGet(k, j, rowStrideB, colStrideB)];
+            }
+        }
+    }
+
+    /*
+    long int i, j, k;
+    double t;
+
+    double *temp = malloc(sizeof(double) * N * K); // other.transpose();
+#   pragma omp parallel for private(i, j) shared(N, K, temp, b) num_threads(threads)
+    for (i = 0; i < N; i++) {
+        for (j = 0; j < K; j++) {
+            temp[i * j * N] = b[internalGet(i, j, colStrideB, rowStrideB)]; // b[internalGet(i, j, rowStrideB, colStrideB)];
+        }
+    }
+
+#   pragma omp parallel for private(i, j, k, t) shared(M, N, K, a, b, c, temp, rowStrideA, colStrideA, rowStrideB, colStrideB) num_threads(threads)
+    for (i = 0; i < M; ++i) {
+        for (j = 0; j < K; ++j) {
+            t = 0;
+            for (k = 0; k < N; ++k) {
+                t += a[internalGet(i, k, rowStrideA, colStrideA)] / *[k + i * N]* / * temp[internalGet(j, k, rowStrideB, colStrideB)] / *[k + j * K]* /;
+            }
+            c[j + i * K] = t;
+        }
+    }
+    */
 }
 
 #endif // LIBPYMATHMODULES_DOBLEFUNCT

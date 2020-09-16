@@ -6,8 +6,7 @@ from time import time
 import math
 import shutil
 
-# Min 8 cores for thread test purposes -- speed may increase with more cores even if they do not register as present (e.g. Google Colab / Repl.it)
-LPM_CORES = max(os.cpu_count(), 8)
+LPM_CORES = os.cpu_count()
 
 # Find the optimal number of threads to use
 def _lpmFindOptimalMatrixThreads(matSize=1000, n=1000, verbose=False):
@@ -41,7 +40,7 @@ def _lpmFindOptimalMatrixThreads(matSize=1000, n=1000, verbose=False):
             inc = math.ceil(n / progLen) # n // progLen
 
             if verbose:
-                print("Testing {} threads   [{}{}]\r".format(str(i).rjust(5), "#" * math.ceil(j / inc), " " * (math.ceil(n / inc) - math.ceil(j / inc))), end="")
+                print("Testing {} thread(s)   [{}{}]\r".format(str(i).rjust(5), "#" * math.ceil(j / inc), " " * (math.ceil(n / inc) - math.ceil(j / inc))), end="")
                 sys.stdout.flush()
 
         if dt < fastTime:
@@ -62,7 +61,7 @@ except FileNotFoundError:
     write = True
 
 if write:
-    LPM_OPTIMAL_MATRIX_THREADS = _lpmFindOptimalMatrixThreads(matSize=1500, n=250, verbose=True)
+    LPM_OPTIMAL_MATRIX_THREADS = _lpmFindOptimalMatrixThreads(matSize=1000, n=250, verbose=True)
 
     with open("{}/_threadInfo.py".format(os.path.dirname(os.path.realpath(__file__))), "w") as f:
         f.write("LPM_CORES = {}\n".format(LPM_CORES))

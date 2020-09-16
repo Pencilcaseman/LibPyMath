@@ -1,9 +1,8 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/LibPyMathModules.dir/main.c.obj"
+  "CMakeFiles/LibPyMathModules.dir/main.c.o"
   "LibPyMathModules.exe"
-  "LibPyMathModules.exe.manifest"
-  "LibPyMathModules.lib"
   "LibPyMathModules.pdb"
+  "libLibPyMathModules.dll.a"
 )
 
 # Per-language clean rules from dependency scanning.

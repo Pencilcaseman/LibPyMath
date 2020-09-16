@@ -156,17 +156,31 @@ def lgompLink():
 		return "-lgomp"
 	return ""
 
+def Wall():	
+	c = compilerName()
+	if c == "msvc":
+		return "-Wall"
+	elif c in ("gcc", "g++"):
+		return "-Wall"
+	elif c == "unix":
+		return "-Wall"
+	elif c == "clang":
+		return "-Wall"
+	return ""
 
-compiler_flags = [stdCompile(), openmpCompile(), fpicCompile(), o3Compile(), mavxCompile()]
+
+compiler_flags = [stdCompile(), openmpCompile(), fpicCompile(), o3Compile(), mavxCompile(), Wall()]
 link_args = [lgompLink()]
 macros = []
 
 ext_modules = [
     Extension(
-        "libpymath.core.testModule",
-        ["libpymath/LibPyMathModules/testModule.c"],
+        "libpymath.error",
+        ["libpymath/LibPyMathModules/error/errorModule.c"],
         extra_compile_args=compiler_flags,
-        extra_link_args=link_args
+        extra_link_args=link_args,
+        define_macros=macros,
+        include_dirs=["./"]
     ),
     Extension(
         "libpymath.core.matrix",
@@ -180,7 +194,7 @@ ext_modules = [
 
 setup(
     name="libpymath",
-    version="0.1.10",
+    version="0.1.11",
     description="A general purpose Python math module",
     long_description=long_description,
     long_description_content_type='text/markdown',

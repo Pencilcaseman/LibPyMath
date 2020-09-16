@@ -26,24 +26,17 @@ import sys
 import os
 from time import time
 
+
 class Matrix:
     def __init__(self, rows=None, cols=None, data=None, dtype="float64", threads=None, internal_new=False):
         self.__safe_for_unpickling__ = True
 
         if internal_new:
             self.matrix = None
-            self._rows = None
-            self._cols = None
-            self._rowStride = None
-            self._colStride = None
             self.dtype = None
             self._threads = _threadInfo.LPM_OPTIMAL_MATRIX_THREADS
         else:
             self.matrix = None
-            self._rows = None
-            self._cols = None
-            self._rowStride = None
-            self._colStride = None
             self.dtype = None
             self._threads = None
 
@@ -89,55 +82,45 @@ class Matrix:
                             # At this point the data is a valid 2d array of any datatype,
                             # so while filling the matrix ensure the data is the correct
                             # type.
-                            self._rows = len(data)
-                            self._cols = dLen
-                            self._rowStride = self._cols
-                            self._colStride = 1
 
                             # Matrix type is based on dtype
                             if dtype == "float64":
-                                self.matrix = _matrix.matrixFromData2D(data, self._rows, self._cols)
+                                self.matrix = _matrix.matrixFromData2D(data, len(data), dLen)
                             else:
                                 raise Exception("Invalid matrix type -- this type may not yet be supported") from TypeError
                         elif isinstance(data[0], (float, int)):
                             # List is *probably* a 1d array to check remaining elements
+                            _rows = 0
+                            _cols = 0
                             if rows is None:
                                 # Matrix is 1 x ? or 1 x cols
                                 if cols is None:
-                                    self._rows = 1
-                                    self._cols = len(data)
-                                    self._rowStride = self._cols
-                                    self._colStride = 1
+                                    _rows = 1
+                                    _cols = len(data)
                                 else:
                                     if cols != len(data):
                                         raise Exception("Invalid number of columns for matrix") from TypeError
 
-                                    self._rows = 1
-                                    self._cols = cols
-                                    self._rowStride = cols
-                                    self._colStride = 1
+                                    _rows = 1
+                                    _cols = cols
                             elif rows is not None and cols is None:
                                 # Matrix is rows x 1
                                 if rows != len(data):
                                     raise Exception("Invalid number of rows for matrix") from TypeError
 
-                                self._rows = rows
-                                self._cols = 1
-                                self._rowStride = 1
-                                self._colStride = 1
+                                _rows = rows
+                                _cols = 1
                             else:
                                 # Matrix is rows x cols
                                 if rows * cols != len(data):
                                     raise Exception("Invalid size for matrix") from TypeError
 
-                                self._rows = rows
-                                self._cols = cols
-                                self._rowStride = cols
-                                self._colStride = 1
+                                _rows = rows
+                                _cols = cols
 
                             # Matrix type is based on dtype
                             if dtype == "float64":
-                                self.matrix = _matrix.matrixFromData1D(data, self._rows, self._cols)
+                                self.matrix = _matrix.matrixFromData1D(data, _rows, _cols)
                             else:
                                 raise Exception("Invalid matrix type -- this type may not yet be supported") from TypeError
                     else:
@@ -146,21 +129,15 @@ class Matrix:
                     raise Exception("Creating a matrix filled with a value is not yet a feature") from NotImplementedError
             else:
                 # Data was not given so create a matrix from rows and columns alone
-                self._rows = rows if rows is not None else 1
-                self._cols = cols if cols is not None else 1
-                self._rowStride = self._cols
-                self._colStride = 1
+                _rows = rows if rows is not None else 1
+                _cols = cols if cols is not None else 1
 
-                self.matrix = _matrix.Matrix(self._rows, self._cols)
+                self.matrix = _matrix.Matrix(_rows, _cols)
 
     @staticmethod
     def _internal_new(matrix, dtype="float64", threads=_threadInfo.LPM_OPTIMAL_MATRIX_THREADS):
         res = Matrix(internal_new=True)
         res.matrix = matrix
-        res._rows = matrix.rows
-        res._cols = matrix.cols
-        res._rowStride = matrix.rowStride
-        res._colStride = matrix.colStride
         res.dtype = dtype
         res._threads = threads
 
@@ -168,29 +145,25 @@ class Matrix:
 
     @property
     def rows(self):
-        return self._rows
+        return self.matrix.rows
 
     @property
     def cols(self):
-        return self._cols
+        return self.matrix._cols
 
     @property
     def rowStride(self):
-        return self._rowStride
+        return self.matrix.rowStride
 
     @property
     def colStride(self):
-        return self._colStride
+        return self.matrix._colStride
 
     @property
     def threads(self):
         return self._threads
 
-    def transpose(self) -> None:
-        # Swap row and column stride
-        self._rowStride, self._colStride = self._colStride, self._rowStride
-        # Swap rows and columns
-        self._rows, self._cols = self._cols, self._rows
+    def transpose(self):
         self.matrix.transposeMagic()
 
     def transposed(self):
@@ -198,26 +171,32 @@ class Matrix:
         res.transpose()
         return res
 
+    def dot(self, other):
+        if isinstance(other, Matrix) and self.matrix.cols == other.matrix.rows:
+            return Matrix._internal_new(self.matrix.matrixProduct(other.matrix, self.threads), self.dtype, self.threads)
+        else:
+            raise Exception("Invalid matrix size for matrix addition") from TypeError
+
     def __add__(self, other):
-        if isinstance(other, Matrix) and self._rows == other._rows and self._cols == other._cols:
+        if isinstance(other, Matrix) and self.matrix.rows == other.matrix.rows and self.matrix.cols == other.matrix.cols:
             return Matrix._internal_new(self.matrix.matrixAddMatrixReturn(other.matrix, self.threads), self.dtype, self.threads)
         else:
             raise Exception("Invalid matrix size for matrix addition") from TypeError
 
     def __sub__(self, other):
-        if isinstance(other, Matrix) and self._rows == other._rows and self._cols == other._cols:
+        if instance(other, Matrix) and self.matrix.rows == other.matrix.rows and self.matrix.cols == other.matrix.cols:
             return Matrix._internal_new(self.matrix.matrixSubMatrixReturn(other.matrix, self.threads), self.dtype, self.threads)
         else:
             raise Exception("Invalid matrix size for matrix subtraction") from TypeError
 
     def __mul__(self, other):
-        if isinstance(other, Matrix) and self._rows == other._rows and self._cols == other._cols:
+        if instance(other, Matrix) and self.matrix.rows == other.matrix.rows and self.matrix.cols == other.matrix.cols:
             return Matrix._internal_new(self.matrix.matrixMulMatrixReturn(other.matrix, self.threads), self.dtype, self.threads)
         else:
             raise Exception("Invalid matrix size for matrix multiplication") from TypeError
 
     def __truediv__(self, other):
-        if isinstance(other, Matrix) and self._rows == other._rows and self._cols == other._cols:
+        if instance(other, Matrix) and self.matrix.rows == other.matrix.rows and self.matrix.cols == other.matrix.cols:
             return Matrix._internal_new(self.matrix.matrixDivMatrixReturn(other.matrix, self.threads), self.dtype, self.threads)
         else:
             raise Exception("Invalid matrix size for matrix division") from TypeError
@@ -247,33 +226,33 @@ class Matrix:
         return self.matrix.matrixToList()
 
     def __str__(self):
-        skipRows = self._rows >= 32
-        skipCols = self._cols >= 32
+        skipRows = self.matrix.rows >= 32
+        skipCols = self.matrix.cols >= 32
 
-        longestBeforeDecimal = [0 for _ in range(self._cols if not skipCols else 6)]
-        longestAfterDecimal = [0 for _ in range(self._cols if not skipCols else 6)]
+        longestBeforeDecimal = [0 for _ in range(self.matrix.cols if not skipCols else 6)]
+        longestAfterDecimal = [0 for _ in range(self.matrix.cols if not skipCols else 6)]
 
         i = 0
-        while i < self._rows:
+        while i < self.matrix.rows:
             if skipRows and i == 3:
-                i = self._rows - 3
+                i = self.matrix.rows - 3
 
             j = 0
-            while j < self._cols:
+            while j < self.matrix.cols:
                 if skipCols and j == 3:
-                    j = self._cols - 3
+                    j = self.matrix.cols - 3
 
                 tmp = str(self.matrix.get(i, j))
 
                 if "." in tmp:
                     index = tmp.index(".")
-                    jj = j if not skipCols or j < 3 else (j - self._cols + 6)
+                    jj = j if not skipCols or j < 3 else (j - self.matrix.cols + 6)
 
                     longestBeforeDecimal[jj] = max([longestBeforeDecimal[jj], index])
                     longestAfterDecimal[jj] = max([longestAfterDecimal[jj], len(tmp) - index])
 
                 else:
-                    jj = j if not skipCols or j < 3 else (j - self._cols + 6)
+                    jj = j if not skipCols or j < 3 else (j - self.matrix.cols + 6)
                     longestBeforeDecimal[jj] = max([longestBeforeDecimal[jj], len(tmp)])
 
                 j += 1
@@ -282,9 +261,9 @@ class Matrix:
         res = "["
         i = 0
 
-        while i < self._rows:
+        while i < self.matrix.rows:
             if skipRows and i == 3:
-                i = self._rows - 3
+                i = self.matrix.rows - 3
 
                 for x in range(6):
                     res += ("  " if x == 0 else "") + " " * (longestBeforeDecimal[x] - 1) + "***" + (" " * longestAfterDecimal[x])
@@ -296,13 +275,13 @@ class Matrix:
             res += "[" if i == 0 else " ["
 
             j = 0
-            while j < self._cols:
+            while j < self.matrix.cols:
                 if skipCols and j == 3:
-                    j = self._cols - 3
+                    j = self.matrix.cols - 3
                     res += "  ***  "
 
                 tmp = str(self.matrix.get(i, j))
-                jj = j if not skipCols or j < 3 else (j - self._cols + 6)
+                jj = j if not skipCols or j < 3 else (j - self.matrix.cols + 6)
 
                 length = tmp.index(".") if "." in tmp else len(tmp)
                 for k in range(longestBeforeDecimal[jj] - length):
@@ -314,12 +293,12 @@ class Matrix:
                 for k in range(longestAfterDecimal[jj] - length):
                     res += " "
 
-                if j + 1 < self._cols and not (skipCols and j == 2):
+                if j + 1 < self.matrix.cols and not (skipCols and j == 2):
                     res += ", "
 
                 j += 1
 
-            res += "]" + ("\n" if i + 1 < self._rows else "")
+            res += "]" + ("\n" if i + 1 < self.matrix.rows else "")
             i += 1
 
         return res + "]"
@@ -330,16 +309,12 @@ class Matrix:
     def __reduce__(self):
         return (
             Matrix,
-            (self._rows, self._cols, self.toList(), self.dtype, self.threads)
+            (self.matrix.rows, self.matrix.cols, self.toList(), self.dtype, self.threads)
         )
 
     def copy(self):
         res = Matrix(internal_new=True)
         res.matrix = self.matrix.copy()
-        res._rows = self._rows
-        res._cols = self._cols
-        res._rowStride = self._rowStride
-        res._colStride = self._colStride
         res.dtype = self.dtype
         res._threads = self._threads
 

@@ -20,7 +20,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 #include <stdio.h>
+#include "error/errorModule.c"
 #include "matrix/matrixModule.c"
+#include "matrix/doubleFunctions.h"
 #include "testModule.c"
 #include "testModuleMoreDirs.c"
 

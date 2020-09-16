@@ -21,93 +21,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #define PY_SSIZE_T_CLEAN
 
-#include <Python.h>
-#include <structmember.h>
+#include <libpymath/LibPyMathModules/internal.h>
 #include <libpymath/LibPyMathModules/matrix/doubleFunctions.h>
 
-#ifdef _OPENMP
-#include <omp.h>
-#endif
-
 static PyTypeObject MatrixCoreType;
-
-// **************************************************************************************************************************** //
-// ==================================================== Internal Functions ==================================================== //
-// **************************************************************************************************************************** //
-
-// Print to python stdout
-void pythonPrint(const char *text) {
-    PyObject *sysmod = PyImport_ImportModuleNoBlock("sys");
-    PyObject *pystdout = PyObject_GetAttrString(sysmod, "stdout");
-    PyObject *result = PyObject_CallMethod(pystdout, "write", "s", text);
-    Py_XDECREF(result);
-    Py_XDECREF(pystdout);
-    Py_XDECREF(sysmod);
-}
-
-#define internalGet(i, j, r, c) ((j) * (c) + (i) * (r))
-
-// A routine to give access to a high precision timer on most systems.
-#if defined(_WIN32) || defined(__CYGWIN__)
-#if !defined(WIN32_LEAN_AND_MEAN)
-#define WIN32_LEAN_AND_MEAN
-#endif
-
-#include <windows.h>
-
-double seconds() {
-    LARGE_INTEGER t;
-    static double oofreq;
-    static int checkedForHighResTimer;
-    static BOOL hasHighResTimer;
-
-    if (!checkedForHighResTimer) {
-        hasHighResTimer = QueryPerformanceFrequency(&t);
-        oofreq = 1.0 / (double) t.QuadPart;
-        checkedForHighResTimer = 1;
-    }
-
-    if (hasHighResTimer) {
-        QueryPerformanceCounter(&t);
-        return (double) t.QuadPart * oofreq;
-    } else {
-        return (double) GetTickCount() * 1.0e-3;
-    }
-}
-
-#elif defined(__linux__) || defined(__APPLE__)
-#include <stddef.h>
-#include <sys/time.h>
-double seconds() {
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    return (double)tv.tv_sec + (double)tv.tv_usec * 1.0e-6;
-}
-#else
-#error unsupported platform
-#endif
-
-// ****************************************************************************************************************************** //
-// ==================================================== Function Definitions ==================================================== //
-// ****************************************************************************************************************************** //
-
-static double *allocateMemory(long int length) {
-    double *res;
-
-    if (length < 0) {
-        PyErr_SetString(PyExc_ValueError, "Cannot allocate negative length");
-        return NULL;
-    }
-
-    res = malloc(sizeof(double) * length);
-
-    if (res == NULL) {
-        PyErr_SetString(PyExc_MemoryError, "Out of memory");
-        return NULL;
-    }
-
-    return res;
-}
 
 // ********************************************************************************************************************** //
 // ==================================================== Matrix Class ==================================================== //
@@ -299,8 +216,8 @@ static PyObject *matrixGetColStride(MatrixCoreObject *self, void *closure) {
 
 static PyObject *matrixTransposeMagic(MatrixCoreObject *self) {
     long int tmp;
-    tmp = self->rowStride;
 
+    tmp = self->rowStride;
     self->rowStride = self->colStride;
     self->colStride = tmp;
 
@@ -309,6 +226,23 @@ static PyObject *matrixTransposeMagic(MatrixCoreObject *self) {
     self->cols = tmp;
 
     Py_RETURN_NONE;
+}
+
+static PyObject *matrixProduct(MatrixCoreObject *self, PyObject *args) {
+    MatrixCoreObject *other;
+    double *resData;
+    int threads = 1;
+
+    if (!PyArg_ParseTuple(args, "O|i", &other, &threads)) {
+        return NULL;
+    }
+
+    resData = allocateMemory(self->rows * other->cols);
+    doubleMatmul(self->rows, self->cols, other->cols, self->data, other->data, resData, self->rowStride, self->colStride, other->rowStride, other->colStride, threads);
+
+    PyObject *res = (PyObject *) matrixNewC(resData, self->rows, other->cols, self->colStride != 1);
+
+    return res;
 }
 
 static PyObject *matrixAddMatrixReturn(MatrixCoreObject *self, PyObject *args) {
@@ -496,6 +430,7 @@ static PyMethodDef matrixMethods[] = {
         {"toString",              (PyCFunction) matrixToString,        METH_NOARGS,  "Give the matrix object as a string"},
         {"copy",                  (PyCFunction) matrixCopy,            METH_NOARGS,  "Return an exact copy of a matrix"},
         {"transposeMagic",        (PyCFunction) matrixTransposeMagic,  METH_NOARGS,  "Transpose the matrix instantly by swapping the rows and columns and the row and column stride"},
+        {"matrixProduct",         (PyCFunction) matrixProduct,         METH_VARARGS, "Calculate the matrix product between two matrices and return the result"},
         {"matrixAddMatrixReturn", (PyCFunction) matrixAddMatrixReturn, METH_VARARGS, "Add one matrix to another and return the result"},
         {"matrixSubMatrixReturn", (PyCFunction) matrixSubMatrixReturn, METH_VARARGS, "Subtract one matrix from another and return the result"},
         {"matrixMulMatrixReturn", (PyCFunction) matrixMulMatrixReturn, METH_VARARGS, "Multiply one matrix by another and return the result"},
