@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: libpymath
-Version: 0.1.12
+Version: 0.2.0
 Summary: A general purpose Python math module
 Home-page: https://www.github.com/pencilcaseman/gpc
 Author: Toby Davis
