@@ -171,14 +171,6 @@ static PyObject *errorRaiseFileExistsError(PyObject *self, PyObject *args) {
     return NULL;
 }
 
-static PyObject *errorRaiseFileNotFoundError(PyObject *self, PyObject *args) {
-    const char *txt;
-    if (!PyArg_ParseTuple(args, "s", &txt))
-        return NULL;
-    PyErr_SetString(PyExc_FileNotFoundError, txt);
-    return NULL;
-}
-
 static PyObject *errorRaiseFloatingPointError(PyObject *self, PyObject *args) {
     const char *txt;
     if (!PyArg_ParseTuple(args, "s", &txt))
@@ -288,14 +280,6 @@ static PyObject *errorRaiseMemoryError(PyObject *self, PyObject *args) {
     if (!PyArg_ParseTuple(args, "s", &txt))
         return NULL;
     PyErr_SetString(PyExc_MemoryError, txt);
-    return NULL;
-}
-
-static PyObject *errorRaiseModuleNotFoundError(PyObject *self, PyObject *args) {
-    const char *txt;
-    if (!PyArg_ParseTuple(args, "s", &txt))
-        return NULL;
-    PyErr_SetString(PyExc_ModuleNotFoundError, txt);
     return NULL;
 }
 
@@ -547,14 +531,6 @@ static PyObject *errorRaiseWarning(PyObject *self, PyObject *args) {
     return NULL;
 }
 
-static PyObject *errorRaiseWindowsError(PyObject *self, PyObject *args) {
-    const char *txt;
-    if (!PyArg_ParseTuple(args, "s", &txt))
-        return NULL;
-    PyErr_SetString(PyExc_WindowsError, txt);
-    return NULL;
-}
-
 // **************************************************************************************************************************** //
 // ==================================================== Module Definitions ==================================================== //
 // **************************************************************************************************************************** //
@@ -578,7 +554,6 @@ static PyMethodDef errorFunctionMethods[] = {
         {"raiseEnvironmentError",          (PyCFunction) errorRaiseEnvironmentError,          METH_VARARGS, "Raise an EnvironmentError"},
         {"raiseException",                 (PyCFunction) errorRaiseException,                 METH_VARARGS, "Raise an Exception"},
         {"raiseFileExistsError",           (PyCFunction) errorRaiseFileExistsError,           METH_VARARGS, "Raise a FileExistsError"},
-        {"raiseFileNotFoundError",         (PyCFunction) errorRaiseFileNotFoundError,         METH_VARARGS, "Raise a FileNotFoundError"},
         {"raiseFloatingPointError",        (PyCFunction) errorRaiseFloatingPointError,        METH_VARARGS, "Raise a FloatingPointError"},
         {"raiseFutureWarning",             (PyCFunction) errorRaiseFutureWarning,             METH_VARARGS, "Raise a FutureWarning"},
         {"raiseGeneratorExit",             (PyCFunction) errorRaiseGeneratorExit,             METH_VARARGS, "Raise a GeneratorExit"},
@@ -593,7 +568,6 @@ static PyMethodDef errorFunctionMethods[] = {
         {"raiseKeyboardInterrupt",         (PyCFunction) errorRaiseKeyboardInterrupt,         METH_VARARGS, "Raise a KeyboardInterrupt"},
         {"raiseLookupError",               (PyCFunction) errorRaiseLookupError,               METH_VARARGS, "Raise a LookupError"},
         {"raiseMemoryError",               (PyCFunction) errorRaiseMemoryError,               METH_VARARGS, "Raise a MemoryError"},
-        {"raiseModuleNotFoundError",       (PyCFunction) errorRaiseModuleNotFoundError,       METH_VARARGS, "Raise a ModuleNotFoundError"},
         {"raiseNameError",                 (PyCFunction) errorRaiseNameError,                 METH_VARARGS, "Raise a NameError"},
         {"raiseNotADirectoryError",        (PyCFunction) errorRaiseNotADirectoryError,        METH_VARARGS, "Raise a NotADirectoryError"},
         {"raiseNotImplementedError",       (PyCFunction) errorRaiseNotImplementedError,       METH_VARARGS, "Raise a NotImplementedError"},
@@ -625,7 +599,6 @@ static PyMethodDef errorFunctionMethods[] = {
         {"raiseUserWarning",               (PyCFunction) errorRaiseUserWarning,               METH_VARARGS, "Raise an UserWarning"},
         {"raiseValueError",                (PyCFunction) errorRaiseValueError,                METH_VARARGS, "Raise a ValueError"},
         {"raiseWarning",                   (PyCFunction) errorRaiseWarning,                   METH_VARARGS, "Raise a Warning"},
-        {"raiseWindowsError",              (PyCFunction) errorRaiseWindowsError,              METH_VARARGS, "Raise a WindowsError"},
         {NULL}
 };
 
