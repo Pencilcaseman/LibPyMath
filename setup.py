@@ -82,7 +82,7 @@ def openmpCompile():
 
 	c = compilerName()
 	if c == "msvc":
-		return "/openmp"
+		return "/openmp[:experimental]"
 	elif c in ("gcc", "g++"):
 		return "-fopenmp"
 	elif c == "clang":
@@ -109,7 +109,7 @@ def fpicCompile():
 def o3Compile():	
 	c = compilerName()
 	if c == "msvc":
-		return "/O3"
+		return "/O2"
 	elif c in ("gcc", "g++"):
 		return "-O3"
 	elif c == "clang":
@@ -140,6 +140,17 @@ def m64Compile():
 		elif c == "clang":
 			return "-m64"
 	return ""
+
+def favorCompile():
+	if compierName() == "msvc":
+		p = platform.processor().split()[0]
+		if p == "AMD64":
+			return "/favor:AMD64"
+		elif p == "INTEL64":
+			return "/favor:INTEL64"
+		elif p == "ATOM":
+			return "/favor:ATOM"
+
 
 def lgompLink():
 	if platform.system() == "Darwin":
@@ -180,7 +191,7 @@ ext_modules = [
         extra_compile_args=compiler_flags,
         extra_link_args=link_args,
         define_macros=macros,
-        include_dirs=["./"]
+        include_dirs=[os.path.dirname(os.path.realpath(__file__))]
     ),
     Extension(
         "libpymath.core.matrix",
@@ -188,13 +199,13 @@ ext_modules = [
         extra_compile_args=compiler_flags,
         extra_link_args=link_args,
         define_macros=macros,
-        include_dirs=["./"]
+        include_dirs=[os.path.dirname(os.path.realpath(__file__))]
     )
 ]
 
 setup(
     name="libpymath",
-    version="0.2.0",
+    version="0.2.8",
     description="A general purpose Python math module",
     long_description=long_description,
     long_description_content_type='text/markdown',

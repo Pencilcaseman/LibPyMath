@@ -19,8 +19,8 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef LIBPYMATHMODULES_INTERNAL_H
-#define LIBPYMATHMODULES_INTERNAL_H
+#ifndef LIBPYMATHMODULES_INTERNALFUNCTIONS_H
+#define LIBPYMATHMODULES_INTERNALFUNCTIONS_H
 
 #include <Python.h>
 #include <structmember.h>
@@ -49,7 +49,7 @@ void pythonPrint(const char *text) {
 
 #include <windows.h>
 
-double seconds() {
+double seconds(void) {
     LARGE_INTEGER t;
     static double oofreq;
     static int checkedForHighResTimer;
@@ -103,4 +103,4 @@ static double *allocateMemory(long int length) {
     return res;
 }
 
-#endif //LIBPYMATHMODULES_INTERNAL_H
+#endif //LIBPYMATHMODULES_INTERNALFUNCTIONS_H

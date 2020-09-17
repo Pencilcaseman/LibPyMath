@@ -3,7 +3,7 @@ project(LibPyMathModules C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(LibPyMathModules main.c matrix/doubleFunctions.h internal.h)
+add_executable(LibPyMathModules main.c matrix/doubleFunctions.h internalFunctions.h)
 
 # C:\Users\penci\OneDrive\Desktop\LibPyMath\LibPyMath\libpymath
 # C:\Users\penci\OneDrive\Desktop\LibPyMath\LibPyMath\libpymath\LibPyMathModules\matrix
