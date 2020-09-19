@@ -78,6 +78,9 @@
 				</MakeCommands>
 			</Target>
 		</Build>
+		<Unit filename="/cygdrive/c/Users/penci/OneDrive/Desktop/LibPyMath/LibPyMath/libpymath/LibPyMathModules/BLAS/dgemm.h">
+			<Option target="LibPyMathModules"/>
+		</Unit>
 		<Unit filename="/cygdrive/c/Users/penci/OneDrive/Desktop/LibPyMath/LibPyMath/libpymath/LibPyMathModules/internalFunctions.h">
 			<Option target="LibPyMathModules"/>
 		</Unit>

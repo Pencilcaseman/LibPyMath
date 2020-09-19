@@ -22,6 +22,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #define PY_SSIZE_T_CLEAN
 
 #include <libpymath/LibPyMathModules/internalFunctions.h>
+#include <libpymath/LibPyMathModules/BLAS/dgemm.h>
 #include <libpymath/LibPyMathModules/matrix/doubleFunctions.h>
 
 static PyTypeObject MatrixCoreType;
@@ -168,11 +169,19 @@ static MatrixCoreObject *matrixNewC(double *data, long int rows, long int cols, 
         return NULL;
     }
 
-    res->rows = rows;
-    res->cols = cols;
-    res->rowStride = (t == 0) ? cols : 1;
-    res->colStride = (t == 0) ? 1 : cols;
-    res->data = data; // resData;
+    if (!t) {
+        res->rows = rows;
+        res->cols = cols;
+        res->rowStride = cols;
+        res->colStride = 1;
+        res->data = data;
+    } else {
+        res->rows = cols;
+        res->cols = rows;
+        res->rowStride = 1;
+        res->colStride = cols;
+        res->data = data;
+    }
 
     return res;
 }
@@ -228,6 +237,25 @@ static PyObject *matrixTransposeMagic(MatrixCoreObject *self) {
     Py_RETURN_NONE;
 }
 
+static PyObject *matrixTransposeReturn(MatrixCoreObject *self) {
+    double *res = allocateMemory(self->rows * self->cols);
+    long int rows, cols, i, j, rs, cs;
+    rows = self->rows;
+    cols = self->cols;
+    rs = self->rowStride;
+    cs = self->colStride;
+    double *data = self->data;
+
+#   pragma omp parallel for private(i, j) shared(rows, cols, rs, cs, data, res)
+    for (i = 0; i < rows; i++) {
+        for (j = 0; j < cols; j++) {
+            res[i + j * rows] = data[internalGet(i, j, rs, cs)];
+        }
+    }
+
+    return (PyObject *) matrixNewC(res, self->cols, self->rows, 0);
+}
+
 static PyObject *matrixProduct(MatrixCoreObject *self, PyObject *args) {
     MatrixCoreObject *other;
     double *resData;
@@ -238,9 +266,16 @@ static PyObject *matrixProduct(MatrixCoreObject *self, PyObject *args) {
     }
 
     resData = allocateMemory(self->rows * other->cols);
-    doubleMatmul(self->rows, self->cols, other->cols, self->data, other->data, resData, self->rowStride, self->colStride, other->rowStride, other->colStride, threads);
+    long int M = self->rows;
+    long int N = self->cols;
+    long int K = other->cols;
+    double alpha = 1.0;
+    double beta = 0.0;
+    const double *a = self->data;
+    const double *b = other->data;
+    dgemm("T", "T", &M, &K, &N, &alpha, a, &N, b, &K, &beta, resData, &M);
 
-    PyObject *res = (PyObject *) matrixNewC(resData, self->rows, other->cols, self->colStride != 1);
+    PyObject *res = (PyObject *) matrixNewC(resData, other->cols, self->rows, 1);
 
     return res;
 }
@@ -430,6 +465,7 @@ static PyMethodDef matrixMethods[] = {
         {"toString",              (PyCFunction) matrixToString,        METH_NOARGS,  "Give the matrix object as a string"},
         {"copy",                  (PyCFunction) matrixCopy,            METH_NOARGS,  "Return an exact copy of a matrix"},
         {"transposeMagic",        (PyCFunction) matrixTransposeMagic,  METH_NOARGS,  "Transpose the matrix instantly by swapping the rows and columns and the row and column stride"},
+        {"transpose",             (PyCFunction) matrixTransposeReturn, METH_NOARGS,  "Transpose the matrix and return the result. This function actually swaps the data around"},
         {"matrixProduct",         (PyCFunction) matrixProduct,         METH_VARARGS, "Calculate the matrix product between two matrices and return the result"},
         {"matrixAddMatrixReturn", (PyCFunction) matrixAddMatrixReturn, METH_VARARGS, "Add one matrix to another and return the result"},
         {"matrixSubMatrixReturn", (PyCFunction) matrixSubMatrixReturn, METH_VARARGS, "Subtract one matrix from another and return the result"},

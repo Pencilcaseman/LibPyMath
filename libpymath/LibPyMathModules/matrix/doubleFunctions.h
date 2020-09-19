@@ -172,41 +172,4 @@ void doubleMatrixDivMatrix(const double *a, const double *b, double *c, long lon
     }
 }
 
-void doubleMatmul(long int M, long int N, long int K, const double *a, const double *b, double *c, long int rowStrideA, long int colStrideA, long int rowStrideB, long int colStrideB, int threads) {
-    long int i, j, k;
-#   pragma omp parallel for private(i, j, k) shared(M, N, K, a, b, c, rowStrideA, colStrideA, rowStrideB, colStrideB) num_threads(threads)
-    for (i = 0; i < M; i++) {
-        for (j = 0; j < K; j++) {
-            c[j + i * K] = 0;
-            for (k = 0; k < N; k++) {
-                c[j + i * K] += a[internalGet(i, k, rowStrideA, colStrideA)] * b[internalGet(k, j, rowStrideB, colStrideB)];
-            }
-        }
-    }
-
-    /*
-    long int i, j, k;
-    double t;
-
-    double *temp = malloc(sizeof(double) * N * K); // other.transpose();
-#   pragma omp parallel for private(i, j) shared(N, K, temp, b) num_threads(threads)
-    for (i = 0; i < N; i++) {
-        for (j = 0; j < K; j++) {
-            temp[i * j * N] = b[internalGet(i, j, colStrideB, rowStrideB)]; // b[internalGet(i, j, rowStrideB, colStrideB)];
-        }
-    }
-
-#   pragma omp parallel for private(i, j, k, t) shared(M, N, K, a, b, c, temp, rowStrideA, colStrideA, rowStrideB, colStrideB) num_threads(threads)
-    for (i = 0; i < M; ++i) {
-        for (j = 0; j < K; ++j) {
-            t = 0;
-            for (k = 0; k < N; ++k) {
-                t += a[internalGet(i, k, rowStrideA, colStrideA)] / *[k + i * N]* / * temp[internalGet(j, k, rowStrideB, colStrideB)] / *[k + j * K]* /;
-            }
-            c[j + i * K] = t;
-        }
-    }
-    */
-}
-
 #endif // LIBPYMATHMODULES_DOBLEFUNCT

@@ -23,6 +23,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "error/errorModule.c"
 #include "matrix/matrixModule.c"
 #include "matrix/doubleFunctions.h"
+#include "BLAS/dgemm.h"
 
 int main() {
     printf("Hello, World!\n");

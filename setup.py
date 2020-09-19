@@ -82,7 +82,7 @@ def openmpCompile():
 
 	c = compilerName()
 	if c == "msvc":
-		return "/openmp[:experimental]"
+		return "/openmp"
 	elif c in ("gcc", "g++"):
 		return "-fopenmp"
 	elif c == "clang":
@@ -205,7 +205,7 @@ ext_modules = [
 
 setup(
     name="libpymath",
-    version="0.2.8",
+    version="0.3.0",
     description="A general purpose Python math module",
     long_description=long_description,
     long_description_content_type='text/markdown',

@@ -28,17 +28,30 @@ from time import time
 
 
 class Matrix:
-    def __init__(self, rows=None, cols=None, data=None, dtype="float64", threads=None, internal_new=False):
+    def __init__(self, rows=None, cols=None, data=None, fastTranspose=None, dtype="float64", threads=None, internal_new=False):
         self.__safe_for_unpickling__ = True
 
         if internal_new:
             self.matrix = None
             self.dtype = None
             self._threads = _threadInfo.LPM_OPTIMAL_MATRIX_THREADS
+            self._fastTranspose = None
         else:
             self.matrix = None
             self.dtype = None
             self._threads = None
+            self._fastTranspose = None
+
+            if fastTranspose is None:
+                self._fastTranspose = True
+            else:
+                if isinstance(fastTranspose, bool):
+                    self._fastTranspose = fastTranspose
+                else:
+                    try:
+                        self._fastTranspose = bool(fastTranspose)
+                    except TypeError:
+                        raise Exception("Invalid value for fastTranspose") from TypeError
 
             if threads is not None:
                 if isinstance(threads, int):
@@ -128,11 +141,14 @@ class Matrix:
                 else:
                     raise Exception("Creating a matrix filled with a value is not yet a feature") from NotImplementedError
             else:
-                # Data was not given so create a matrix from rows and columns alone
-                _rows = rows if rows is not None else 1
-                _cols = cols if cols is not None else 1
+                if isinstance(rows, int) and isinstance(cols, int):
+                    # Data was not given so create a matrix from rows and columns alone
+                    _rows = rows if rows is not None else 1
+                    _cols = cols if cols is not None else 1
 
-                self.matrix = _matrix.Matrix(_rows, _cols)
+                    self.matrix = _matrix.Matrix(_rows, _cols)
+                elif isinstance(rows, list):
+                    self.__init__(data=rows)
 
     @staticmethod
     def _internal_new(matrix, dtype="float64", threads=_threadInfo.LPM_OPTIMAL_MATRIX_THREADS):
@@ -149,7 +165,7 @@ class Matrix:
 
     @property
     def cols(self):
-        return self.matrix._cols
+        return self.matrix.cols
 
     @property
     def rowStride(self):
@@ -157,25 +173,64 @@ class Matrix:
 
     @property
     def colStride(self):
-        return self.matrix._colStride
+        return self.matrix.colStride
 
     @property
     def threads(self):
         return self._threads
 
+    @property
+    def fastTranspose(self):
+        return self._fastTranspose
+
+    @fastTranspose.setter
+    def fastTranspose(self, val):
+        if val is None:
+            self._fastTranspose = True
+        else:
+            if isinstance(val, bool):
+                self._fastTranspose = val
+            else:
+                try:
+                    self._fastTranspose = bool(val)
+                except TypeError:
+                    raise Exception("Invalid value for fastTranspose") from TypeError    
+
     def transpose(self):
-        self.matrix.transposeMagic()
+        if self._fastTranspose:
+            self.matrix.transposeMagic()
+        else:
+            self.matrix = self.matrix.transpose()
 
     def transposed(self):
-        res = self.copy()
-        res.transpose()
-        return res
+        if self._fastTranspose:
+            res = self.copy()
+            res.transpose()
+            return res
+        else:
+            res = Matrix(self.rows, self.cols, fastTranspose=True, internal_new=True)
+            res.matrix = self.matrix.transpose()
+            return res
+
+    @property
+    def T(self):
+        if self._fastTranspose:
+            res = self.copy()
+            res.transpose()
+            return res
+        else:
+            res = Matrix(self.rows, self.cols, fastTranspose=True, internal_new=True)
+            res.matrix = self.matrix.transpose()
+            return res
 
     def dot(self, other):
         if isinstance(other, Matrix) and self.matrix.cols == other.matrix.rows:
             return Matrix._internal_new(self.matrix.matrixProduct(other.matrix, self.threads), self.dtype, self.threads)
         else:
             raise Exception("Invalid matrix size for matrix addition") from TypeError
+
+    def __matmul__(self, other):
+        return self.dot(other)
 
     def __add__(self, other):
         if isinstance(other, Matrix) and self.matrix.rows == other.matrix.rows and self.matrix.cols == other.matrix.cols:
@@ -201,13 +256,7 @@ class Matrix:
         else:
             raise Exception("Invalid matrix size for matrix division") from TypeError
 
-    @property
-    def T(self):
-        res = self.copy()
-        res.transpose()
-        return res
-
-    # TO DO: Make this return a vector of the relevant row -- i.e. matrix[0] -> [1, 2, 3]
+    # TODO: Make this return a vector of the relevant row -- i.e. matrix[0] -> [1, 2, 3]
     def __getitem__(self, pos):
         if isinstance(pos, tuple):
             i, j = pos
@@ -317,5 +366,6 @@ class Matrix:
         res.matrix = self.matrix.copy()
         res.dtype = self.dtype
         res._threads = self._threads
+        res._fastTranspose = self._fastTranspose
 
         return res

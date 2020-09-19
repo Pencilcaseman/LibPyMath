@@ -39,13 +39,16 @@ def _lpmFindOptimalMatrixThreads(matSize=1000, n=1000, verbose=False):
             progLen = termWidth - 31
             inc = math.ceil(n / progLen) # n // progLen
 
-            if verbose:
+            if verbose and j % 10 == 0:
                 print("Testing {} thread(s)   [{}{}]\r".format(str(i).rjust(5), "#" * math.ceil(j / inc), " " * (math.ceil(n / inc) - math.ceil(j / inc))), end="")
                 sys.stdout.flush()
 
         if dt < fastTime:
             fastTime = dt
             fastThreads = i
+
+        if not verbose:
+            print("Tested {} cores".format(i))
 
     if verbose:
         print("", end=" " * (termWidth - 5) + "\r")
@@ -60,8 +63,11 @@ try:
 except FileNotFoundError:
     write = True
 
+# If running in idle don't use verbose output. It takes *FOREVER* due to the printing speed
+verbose = "idlelib.run" not in sys.modules
+
 if write:
-    LPM_OPTIMAL_MATRIX_THREADS = _lpmFindOptimalMatrixThreads(matSize=1000, n=250, verbose=True)
+    LPM_OPTIMAL_MATRIX_THREADS = _lpmFindOptimalMatrixThreads(matSize=1000, n=250, verbose=verbose)
 
     with open("{}/_threadInfo.py".format(os.path.dirname(os.path.realpath(__file__))), "w") as f:
         f.write("LPM_CORES = {}\n".format(LPM_CORES))

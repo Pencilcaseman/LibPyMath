@@ -41,6 +41,7 @@ void pythonPrint(const char *text) {
 
 #define internalGet(i, j, r, c) ((j) * (c) + (i) * (r))
 
+#ifndef _OPENMP
 // A routine to give access to a high precision timer on most systems.
 #if defined(_WIN32) || defined(__CYGWIN__)
 #if !defined(WIN32_LEAN_AND_MEAN)
@@ -79,6 +80,11 @@ double seconds() {
 }
 #else
 #error unsupported platform
+#endif
+
+#define TIME (seconds())
+#else
+#define TIME (omp_get_wtime())
 #endif
 
 // ****************************************************************************************************************************** //

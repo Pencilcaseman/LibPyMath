@@ -20,6 +20,7 @@ libpymath/LibPyMathModules/.idea/vcs.xml
 libpymath/LibPyMathModules/.idea/workspace.xml
 libpymath/LibPyMathModules/.idea/codeStyles/codeStyleConfig.xml
 libpymath/LibPyMathModules/.idea/dictionaries/penci.xml
+libpymath/LibPyMathModules/BLAS/dgemm.h
 libpymath/LibPyMathModules/cmake-build-debug/CMakeCache.txt
 libpymath/LibPyMathModules/cmake-build-debug/LibPyMathModules.cbp
 libpymath/LibPyMathModules/cmake-build-debug/Makefile

@@ -2,6 +2,7 @@
   <dictionary name="penci">
     <words>
       <w>basicsize</w>
+      <w>doublefunctions</w>
       <w>itemsize</w>
       <w>libpymath</w>
       <w>libpymathmodules</w>
