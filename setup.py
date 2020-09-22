@@ -67,13 +67,13 @@ long_description = (this_directory / 'README.md').read_text(encoding='utf-8')
 def stdCompile():
 	c = compilerName()
 	if c == "msvc":
-		return ""
+		return "/std:c11"
 	elif c in ("gcc", "g++"):
-		return "-std=c99"
+		return "-std=c11"
 	elif c == "clang":
-		return "-std=c99"
+		return "-std=c11"
 	elif c == "unix":
-		return "-std=c99"
+		return "-std=c11"
 	return ""
 
 def openmpCompile():
@@ -205,7 +205,7 @@ ext_modules = [
 
 setup(
     name="libpymath",
-    version="0.3.0",
+    version="0.3.1",
     description="A general purpose Python math module",
     long_description=long_description,
     long_description_content_type='text/markdown',

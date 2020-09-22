@@ -2,7 +2,11 @@
 #define BLAS_DGEMM_H
 
 #include <stdlib.h>
-#include "../internalFunctions.h"
+#include <math.h>
+#include <stdint.h>
+#include <libpymath/LibPyMathModules/builtin/stdalign.h>
+#include <libpymath/LibPyMathModules/internalFunctions.h>
+#include <emmintrin.h>
 
 #define THREADS 32
 
@@ -14,18 +18,18 @@
 #define xerbla_(txt, x) { printf((txt)); printf("%li\n", (x)); }
 
 /* Subroutine */ int dgemm(const char *transa,      // op(A)
-                           const char *transb,      // op(B)
-                           const long int *m,       // Rows of A and C
-                           const long int *n,       // Cols of B and C
-                           const long int *k,       // Cols of A and rows of B
-                           const double *alpha,     // Scale factor alpha
-                           const double *a,         // Matrix a
-                           const long int *lda,     // Leading dimension of A
-                           const double *b,         // Matrix b
-                           const long int *ldb,     // Leading dimension of B
-                           const double *beta,      // Scale factor beta
-                           double *c__,             // Result matrix C
-                           const long int *ldc      // Leading dimension of C
+                                 const char *transb,      // op(B)
+                                 const long int *m,       // Rows of A and C
+                                 const long int *n,       // Cols of B and C
+                                 const long int *k,       // Cols of A and rows of B
+                                 const double *alpha,     // Scale factor alpha
+                                 const double *a,         // Matrix a
+                                 const long int *lda,     // Leading dimension of A
+                                 const double *b,         // Matrix b
+                                 const long int *ldb,     // Leading dimension of B
+                                 const double *beta,      // Scale factor beta
+                                 double *c__,             // Result matrix C
+                                 const long int *ldc      // Leading dimension of C
 ) {
     /* System generated locals */
     long int a_dim1, a_offset, b_dim1, b_offset, c_dim1, c_offset, i__1, i__2,
@@ -394,4 +398,4 @@
 
 } /* dgemm_ */
 
-#endif // BLAS_DGEMM_H
+#endif

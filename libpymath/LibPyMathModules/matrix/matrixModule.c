@@ -273,6 +273,7 @@ static PyObject *matrixProduct(MatrixCoreObject *self, PyObject *args) {
     double beta = 0.0;
     const double *a = self->data;
     const double *b = other->data;
+
     dgemm("T", "T", &M, &K, &N, &alpha, a, &N, b, &K, &beta, resData, &M);
 
     PyObject *res = (PyObject *) matrixNewC(resData, other->cols, self->rows, 1);
