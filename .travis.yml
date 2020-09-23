@@ -18,6 +18,7 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 language: python
+os: linux
 env:
   global:
     - CIBW_BUILD=cp3?-*
@@ -29,7 +30,6 @@ jobs:
   include:
     # perform a linux build
     - services: docker
-    - os: linux
     - os: osx
       language: generic
       env: MACOSX_DEPLOYMENT_TARGET=10.9
