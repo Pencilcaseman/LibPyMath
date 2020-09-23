@@ -10,26 +10,25 @@
 
 #define THREADS 32
 
-#if !(defined(max) && defined(min))
+#undef max
 #define max(x, y) ((x) > (y) ? (x) : (y))
-#define min(x, y) ((x) < (y) ? (x) : (y))
-#endif
 #define lsame_(a, b) ((a) == (b))
 #define xerbla_(txt, x) { printf((txt)); printf("%li\n", (x)); }
 
+
 /* Subroutine */ int dgemm(const char *transa,      // op(A)
-                                 const char *transb,      // op(B)
-                                 const long int *m,       // Rows of A and C
-                                 const long int *n,       // Cols of B and C
-                                 const long int *k,       // Cols of A and rows of B
-                                 const double *alpha,     // Scale factor alpha
-                                 const double *a,         // Matrix a
-                                 const long int *lda,     // Leading dimension of A
-                                 const double *b,         // Matrix b
-                                 const long int *ldb,     // Leading dimension of B
-                                 const double *beta,      // Scale factor beta
-                                 double *c__,             // Result matrix C
-                                 const long int *ldc      // Leading dimension of C
+                           const char *transb,      // op(B)
+                           const long int *m,       // Rows of A and C
+                           const long int *n,       // Cols of B and C
+                           const long int *k,       // Cols of A and rows of B
+                           const double *alpha,     // Scale factor alpha
+                           const double *a,         // Matrix a
+                           const long int *lda,     // Leading dimension of A
+                           const double *b,         // Matrix b
+                           const long int *ldb,     // Leading dimension of B
+                           const double *beta,      // Scale factor beta
+                           double *c__,             // Result matrix C
+                           const long int *ldc      // Leading dimension of C
 ) {
     /* System generated locals */
     long int a_dim1, a_offset, b_dim1, b_offset, c_dim1, c_offset, i__1, i__2,
@@ -187,8 +186,8 @@
     c__ -= c_offset;
 
     /* Function Body */
-    nota = lsame_(transa, "N");
-    notb = lsame_(transb, "N");
+    nota = lsame_(*transa, *"N");
+    notb = lsame_(*transb, *"N");
     if (nota) {
         nrowa = *m;
         ncola = *k;
@@ -205,11 +204,11 @@
 /*     Test the input parameters. */
 
     info = 0;
-    if (!nota && !lsame_(transa, "C") && !lsame_(
-            transa, "T")) {
+    if (!nota && !lsame_(*transa, *"C") && !lsame_(
+            *transa, *"T")) {
         info = 1;
-    } else if (!notb && !lsame_(transb, "C") && !
-            lsame_(transb, "T")) {
+    } else if (!notb && !lsame_(*transb, *"C") && !
+            lsame_(*transb, *"T")) {
         info = 2;
     } else if (*m < 0) {
         info = 3;
@@ -225,7 +224,7 @@
         info = 13;
     }
     if (info != 0) {
-        xerbla_("DGEMM ", info);
+        xerbla_("DGEMM ", info)
         return 0;
     }
 
@@ -240,7 +239,7 @@
     if (*alpha == 0.) {
         if (*beta == 0.) {
             i__1 = *n;
-#pragma omp parallel for private(j, i__2, i__) shared(i__1, c__, c_dim1) num_threads(THREADS)
+#pragma omp parallel for private(j, i__2, i__) shared(i__1, c__, c_dim1, m) default(none) num_threads(THREADS)
             for (j = 1; j <= i__1; ++j) {
                 i__2 = *m;
                 for (i__ = 1; i__ <= i__2; ++i__) {
@@ -251,7 +250,7 @@
             }
         } else {
             i__1 = *n;
-#pragma omp parallel for private(j, i__, i__2) shared(i__1, m, c__, c_dim1, beta) num_threads(THREADS)
+#pragma omp parallel for private(j, i__, i__2) shared(i__1, m, c__, c_dim1, beta) default(none) num_threads(THREADS)
             for (j = 1; j <= i__1; ++j) {
                 i__2 = *m;
                 for (i__ = 1; i__ <= i__2; ++i__) {
@@ -266,129 +265,65 @@
 
 /*     Start the operations. */
 
-    if (notb) {
-        if (nota) {
+    if (nota) {
 
 /*           Form  C := alpha*A*B + beta*C. */
 
-            i__1 = *n;
-#pragma omp parallel for private(j, i__2, i__, l, i__3, temp) shared(i__1, beta, m, c__, c_dim1, b, b_dim1, alpha, a, a_dim1) num_threads(THREADS)
-            for (j = 1; j <= i__1; ++j) {
-                if (*beta == 0.) {
-                    i__2 = *m;
-                    for (i__ = 1; i__ <= i__2; ++i__) {
-                        c__[i__ + j * c_dim1] = 0.;
+        i__1 = *n;
+#pragma omp parallel for private(j, i__2, i__, l, i__3, temp) shared(i__1, beta, m, c__, c_dim1, b, b_dim1, alpha, a, a_dim1, k) default(none) num_threads(THREADS)
+        for (j = 1; j <= i__1; ++j) {
+            if (*beta == 0.) {
+                i__2 = *m;
+                for (i__ = 1; i__ <= i__2; ++i__) {
+                    c__[i__ + j * c_dim1] = 0.;
 /* L50: */
-                    }
-                } else if (*beta != 1.) {
-                    i__2 = *m;
-                    for (i__ = 1; i__ <= i__2; ++i__) {
-                        c__[i__ + j * c_dim1] = *beta * c__[i__ + j * c_dim1];
+                }
+            } else if (*beta != 1.) {
+                i__2 = *m;
+                for (i__ = 1; i__ <= i__2; ++i__) {
+                    c__[i__ + j * c_dim1] = *beta * c__[i__ + j * c_dim1];
 /* L60: */
-                    }
                 }
-                i__2 = *k;
-                for (l = 1; l <= i__2; ++l) {
-                    if (b[l + j * b_dim1] != 0.) {
-                        temp = *alpha * b[l + j * b_dim1];
-                        i__3 = *m;
-                        for (i__ = 1; i__ <= i__3; ++i__) {
-                            c__[i__ + j * c_dim1] += temp * a[i__ + l *
-                                                                    a_dim1];
-/* L70: */
-                        }
-                    }
-/* L80: */
-                }
-/* L90: */
             }
-        } else {
+            i__2 = *k;
+            for (l = 1; l <= i__2; ++l) {
+                if (b[l + j * b_dim1] != 0.) {
+                    temp = *alpha * b[l + j * b_dim1];
+                    i__3 = *m;
+                    for (i__ = 1; i__ <= i__3; ++i__) {
+                        c__[i__ + j * c_dim1] += temp * a[i__ + l *
+                                                                a_dim1];
+/* L70: */
+                    }
+                }
+/* L80: */
+            }
+/* L90: */
+        }
+    } else {
 
 /*           Form  C := alpha*A'*B + beta*C */
 
-            i__1 = *n;
-#pragma omp parallel for private(j, i__2, i__, l, i__3, temp) shared(i__1, beta, m, c__, c_dim1, b, b_dim1, alpha, a, a_dim1) num_threads(THREADS)
-            for (j = 1; j <= i__1; ++j) {
-                i__2 = *m;
-                for (i__ = 1; i__ <= i__2; ++i__) {
-                    temp = 0.;
-                    i__3 = *k;
-                    for (l = 1; l <= i__3; ++l) {
-                        temp += a[l + i__ * a_dim1] * b[l + j * b_dim1];
+        i__1 = *n;
+#pragma omp parallel for private(j, i__2, i__, l, i__3, temp) shared(i__1, beta, m, c__, c_dim1, b, b_dim1, alpha, a, a_dim1, k) default(none) num_threads(THREADS)
+        for (j = 1; j <= i__1; ++j) {
+            i__2 = *m;
+            for (i__ = 1; i__ <= i__2; ++i__) {
+                temp = 0.;
+                i__3 = *k;
+                for (l = 1; l <= i__3; ++l) {
+                    temp += a[l + i__ * a_dim1] * b[l + j * b_dim1];
 /* L100: */
-                    }
-                    if (*beta == 0.) {
-                        c__[i__ + j * c_dim1] = *alpha * temp;
-                    } else {
-                        c__[i__ + j * c_dim1] = *alpha * temp + *beta * c__[
-                                i__ + j * c_dim1];
-                    }
-/* L110: */
                 }
-/* L120: */
-            }
-        }
-    } else {
-        if (nota) {
-
-/*           Form  C := alpha*A*B' + beta*C */
-
-            i__1 = *n;
-#pragma omp parallel for private(j, i__2, i__, l, i__3, temp) shared(i__1, beta, m, c__, c_dim1, b, b_dim1, alpha, a, a_dim1) num_threads(THREADS)
-            for (j = 1; j <= i__1; ++j) {
                 if (*beta == 0.) {
-                    i__2 = *m;
-                    for (i__ = 1; i__ <= i__2; ++i__) {
-                        c__[i__ + j * c_dim1] = 0.;
-/* L130: */
-                    }
-                } else if (*beta != 1.) {
-                    i__2 = *m;
-                    for (i__ = 1; i__ <= i__2; ++i__) {
-                        c__[i__ + j * c_dim1] = *beta * c__[i__ + j * c_dim1];
-/* L140: */
-                    }
+                    c__[i__ + j * c_dim1] = *alpha * temp;
+                } else {
+                    c__[i__ + j * c_dim1] = *alpha * temp + *beta * c__[
+                            i__ + j * c_dim1];
                 }
-                i__2 = *k;
-                for (l = 1; l <= i__2; ++l) {
-                    if (b[j + l * b_dim1] != 0.) {
-                        temp = *alpha * b[j + l * b_dim1];
-                        i__3 = *m;
-                        for (i__ = 1; i__ <= i__3; ++i__) {
-                            c__[i__ + j * c_dim1] += temp * a[i__ + l *
-                                                                    a_dim1];
-/* L150: */
-                        }
-                    }
-/* L160: */
-                }
-/* L170: */
+/* L110: */
             }
-        } else {
-
-/*           Form  C := alpha*A'*B' + beta*C */
-
-            i__1 = *n;
-#pragma omp parallel for private(j, i__2, i__, l, i__3, temp) shared(i__1, beta, m, c__, c_dim1, b, b_dim1, alpha, a, a_dim1) num_threads(THREADS)
-            for (j = 1; j <= i__1; ++j) {
-                i__2 = *m;
-                for (i__ = 1; i__ <= i__2; ++i__) {
-                    temp = 0.;
-                    i__3 = *k;
-                    for (l = 1; l <= i__3; ++l) {
-                        temp += a[l + i__ * a_dim1] * b[j + l * b_dim1];
-/* L180: */
-                    }
-                    if (*beta == 0.) {
-                        c__[i__ + j * c_dim1] = *alpha * temp;
-                    } else {
-                        c__[i__ + j * c_dim1] = *alpha * temp + *beta * c__[
-                                i__ + j * c_dim1];
-                    }
-/* L190: */
-                }
-/* L200: */
-            }
+/* L120: */
         }
     }
 
