@@ -30,7 +30,6 @@ jobs:
     # perform a linux build
     - services: docker
     - os: linux
-      language: bash
     - os: osx
       language: generic
       env: MACOSX_DEPLOYMENT_TARGET=10.9
