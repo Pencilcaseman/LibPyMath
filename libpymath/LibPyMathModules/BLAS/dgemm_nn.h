@@ -322,7 +322,7 @@ dgemm_macro_kernel(long int mc,
     long int mr, nr;
     long int i, j;
 
-#   pragma omp parallel for private(j, nr, i, mr) shared(np, _nr, mp, _mr, kc, alpha, A_BUFFER, B_BUFFER, C_BUFFER, C, beta) default(none)
+#   pragma omp parallel for private(j, nr, i, mr) shared(np, _nr, mp, _mr, kc, alpha, A_BUFFER, B_BUFFER, C_BUFFER, C, beta, incRowC, incColC) default(none)
     for (j = 0; j < np; ++j) {
         nr = (j != np - 1 || _nr == 0) ? NR : _nr;
 
@@ -728,7 +728,7 @@ dgemm_macro_kernel(long int mc,
     long int mr, nr;
     long int i, j;
 
-#   pragma omp parallel for private(j, nr, i, mr) shared(np, _nr, mp, _mr, kc, alpha, A_BUFFER, B_BUFFER, C_BUFFER, C, beta) default(none)
+#   pragma omp parallel for private(j, nr, i, mr) shared(np, _nr, mp, _mr, kc, alpha, A_BUFFER, B_BUFFER, C_BUFFER, C, beta, incRowC, incColC) default(none)
     for (j = 0; j < np; ++j) {
         nr = (j != np - 1 || _nr == 0) ? NR : _nr;
 
