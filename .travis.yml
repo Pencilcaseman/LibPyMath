@@ -28,7 +28,6 @@ env:
 
 jobs:
   include:
-    # perform a linux build
     - services: docker
     - os: osx
       language: generic

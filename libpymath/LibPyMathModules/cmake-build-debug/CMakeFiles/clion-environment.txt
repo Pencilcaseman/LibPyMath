@@ -1,4 +1,4 @@
-ToolSet: 3.1.7 (local)@C:\cygwin64
-Options: 
+ToolSet: 15.0 (local)@C:\Program Files (x86)\Microsoft Visual Studio\2017\Community
+Options: msvc.arch=amd64
 
 Options:

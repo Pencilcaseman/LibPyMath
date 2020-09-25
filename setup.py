@@ -151,7 +151,6 @@ def favorCompile():
 		elif p == "ATOM":
 			return "/favor:ATOM"
 
-
 def lgompLink():
 	if platform.system() == "Darwin":
 		return ""
@@ -179,7 +178,6 @@ def Wall():
 		return "-Wall"
 	return ""
 
-
 compiler_flags = [stdCompile(), openmpCompile(), fpicCompile(), o3Compile(), mavxCompile(), Wall()]
 link_args = [lgompLink()]
 macros = []
@@ -205,7 +203,7 @@ ext_modules = [
 
 setup(
     name="libpymath",
-    version="0.3.2",
+    version="0.3.3",
     description="A general purpose Python math module",
     long_description=long_description,
     long_description_content_type='text/markdown',

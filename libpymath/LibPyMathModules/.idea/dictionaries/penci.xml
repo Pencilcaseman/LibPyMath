@@ -2,6 +2,8 @@
   <dictionary name="penci">
     <words>
       <w>basicsize</w>
+      <w>dgeaxpy</w>
+      <w>dgescal</w>
       <w>doublefunctions</w>
       <w>gemm</w>
       <w>itemsize</w>

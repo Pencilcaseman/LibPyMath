@@ -446,17 +446,33 @@ cpython/unicodeobject.h
 
 ../../../../../../../../penci/anaconda3/pkgs/python-3.8.3-he1778fa_2/include/weakrefobject.h
 
-../../../libpymath/LibPyMathModules/BLAS/dgemm.h
-stdlib.h
+../../../libpymath/LibPyMathModules/BLAS/dgemm.c
+ulmblas.h
+../../../libpymath/LibPyMathModules/BLAS/ulmblas.h
+xerbla.h
+../../../libpymath/LibPyMathModules/BLAS/xerbla.h
+dgemm_nn.h
+../../../libpymath/LibPyMathModules/BLAS/dgemm_nn.h
+
+../../../libpymath/LibPyMathModules/BLAS/dgemm_nn.h
+ulmblas.h
+../../../libpymath/LibPyMathModules/BLAS/ulmblas.h
+stdio.h
 -
-math.h
+emmintrin.h
 -
-stdalign.h
+immintrin.h
 -
-stdint.h
+
+../../../libpymath/LibPyMathModules/BLAS/ulmblas.h
+ctype.h
 -
-../internalFunctions.h
-../../../libpymath/LibPyMathModules/internalFunctions.h
+
+../../../libpymath/LibPyMathModules/BLAS/xerbla.h
+ulmblas.h
+../../../libpymath/LibPyMathModules/BLAS/ulmblas.h
+stdio.h
+-
 
 ../../../libpymath/LibPyMathModules/internalFunctions.h
 Python.h
@@ -476,22 +492,30 @@ sys/time.h
 libpymath/LibPyMathModules/internalFunctions.h
 -
 
-/cygdrive/c/Users/penci/OneDrive/Desktop/LibPyMath/LibPyMath/libpymath/LibPyMathModules/error/errorModule.c
+C:/Users/penci/OneDrive/Desktop/LibPyMath/LibPyMath/libpymath/LibPyMathModules/error/errorModule.c
 libpymath/LibPyMathModules/internalFunctions.h
 -
 
-/cygdrive/c/Users/penci/OneDrive/Desktop/LibPyMath/LibPyMath/libpymath/LibPyMathModules/main.c
+C:/Users/penci/OneDrive/Desktop/LibPyMath/LibPyMath/libpymath/LibPyMathModules/main.c
 stdio.h
 -
 error/errorModule.c
-/cygdrive/c/Users/penci/OneDrive/Desktop/LibPyMath/LibPyMath/libpymath/LibPyMathModules/error/errorModule.c
-matrix/matrixDeleteThisPlease.cpp
-/cygdrive/c/Users/penci/OneDrive/Desktop/LibPyMath/LibPyMath/libpymath/LibPyMathModules/matrix/matrixDeleteThisPlease.cpp
+C:/Users/penci/OneDrive/Desktop/LibPyMath/LibPyMath/libpymath/LibPyMathModules/error/errorModule.c
+matrix/matrixModule.c
+C:/Users/penci/OneDrive/Desktop/LibPyMath/LibPyMath/libpymath/LibPyMathModules/matrix/matrixModule.c
+matrix/doubleFunctions.h
+C:/Users/penci/OneDrive/Desktop/LibPyMath/LibPyMath/libpymath/LibPyMathModules/matrix/doubleFunctions.h
+BLAS/dgemm.h
+C:/Users/penci/OneDrive/Desktop/LibPyMath/LibPyMath/libpymath/LibPyMathModules/BLAS/dgemm.h
 
-/cygdrive/c/Users/penci/OneDrive/Desktop/LibPyMath/LibPyMath/libpymath/LibPyMathModules/matrix/matrixDeleteThisPlease.cpp
+C:/Users/penci/OneDrive/Desktop/LibPyMath/LibPyMath/libpymath/LibPyMathModules/matrix/doubleFunctions.h
 libpymath/LibPyMathModules/internalFunctions.h
 -
-libpymath/LibPyMathModules/BLAS/dgemm.h
+
+C:/Users/penci/OneDrive/Desktop/LibPyMath/LibPyMath/libpymath/LibPyMathModules/matrix/matrixModule.c
+libpymath/LibPyMathModules/internalFunctions.h
+-
+libpymath/LibPyMathModules/BLAS/dgemm.c
 -
 libpymath/LibPyMathModules/matrix/doubleFunctions.h
 -

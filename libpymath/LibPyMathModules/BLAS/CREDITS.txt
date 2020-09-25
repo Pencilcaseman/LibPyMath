@@ -1,0 +1,8 @@
+The code in this file is extracted from ulmBLAS written by Michael Lehn
+with some minor alterations and I do not take credit for any of it.
+
+Here is the GitHub source code
+https://github.com/michael-lehn/ulmBLAS
+
+And here are the files on their website
+http://apfel.mathematik.uni-ulm.de/~lehn/sghpc/gemm/dir.html

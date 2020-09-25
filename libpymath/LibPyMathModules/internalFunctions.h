@@ -91,7 +91,7 @@ double seconds() {
 // ==================================================== Function Definitions ==================================================== //
 // ****************************************************************************************************************************** //
 
-static double *allocateMemory(long int length) {
+static double *allocateMemory(long long length) {
     double *res;
 
     if (length < 0) {

@@ -20,7 +20,11 @@ libpymath/LibPyMathModules/.idea/vcs.xml
 libpymath/LibPyMathModules/.idea/workspace.xml
 libpymath/LibPyMathModules/.idea/codeStyles/codeStyleConfig.xml
 libpymath/LibPyMathModules/.idea/dictionaries/penci.xml
-libpymath/LibPyMathModules/BLAS/dgemm.h
+libpymath/LibPyMathModules/BLAS/CREDITS.txt
+libpymath/LibPyMathModules/BLAS/dgemm.c
+libpymath/LibPyMathModules/BLAS/dgemm_nn.h
+libpymath/LibPyMathModules/BLAS/ulmblas.h
+libpymath/LibPyMathModules/BLAS/xerbla.h
 libpymath/LibPyMathModules/builtin/stdalign.h
 libpymath/LibPyMathModules/cmake-build-debug/CMakeCache.txt
 libpymath/LibPyMathModules/cmake-build-debug/LibPyMathModules.cbp
@@ -41,7 +45,8 @@ libpymath/LibPyMathModules/cmake-build-debug/CMakeFiles/3.17.3/CMakeDetermineCom
 libpymath/LibPyMathModules/cmake-build-debug/CMakeFiles/3.17.3/CMakeRCCompiler.cmake
 libpymath/LibPyMathModules/cmake-build-debug/CMakeFiles/3.17.3/CMakeSystem.cmake
 libpymath/LibPyMathModules/cmake-build-debug/CMakeFiles/3.17.3/CompilerIdC/CMakeCCompilerId.c
-libpymath/LibPyMathModules/cmake-build-debug/CMakeFiles/3.17.3/CompilerIdC/a.exe
+libpymath/LibPyMathModules/cmake-build-debug/CMakeFiles/3.17.3/CompilerIdC/CMakeCCompilerId.exe
+libpymath/LibPyMathModules/cmake-build-debug/CMakeFiles/3.17.3/CompilerIdC/CMakeCCompilerId.obj
 libpymath/LibPyMathModules/cmake-build-debug/CMakeFiles/LibPyMathModules.dir/C.includecache
 libpymath/LibPyMathModules/cmake-build-debug/CMakeFiles/LibPyMathModules.dir/DependInfo.cmake
 libpymath/LibPyMathModules/cmake-build-debug/CMakeFiles/LibPyMathModules.dir/build.make
@@ -49,8 +54,9 @@ libpymath/LibPyMathModules/cmake-build-debug/CMakeFiles/LibPyMathModules.dir/cma
 libpymath/LibPyMathModules/cmake-build-debug/CMakeFiles/LibPyMathModules.dir/depend.internal
 libpymath/LibPyMathModules/cmake-build-debug/CMakeFiles/LibPyMathModules.dir/depend.make
 libpymath/LibPyMathModules/cmake-build-debug/CMakeFiles/LibPyMathModules.dir/flags.make
-libpymath/LibPyMathModules/cmake-build-debug/CMakeFiles/LibPyMathModules.dir/link.txt
+libpymath/LibPyMathModules/cmake-build-debug/CMakeFiles/LibPyMathModules.dir/objects1.rsp
 libpymath/LibPyMathModules/cmake-build-debug/CMakeFiles/LibPyMathModules.dir/progress.make
+libpymath/LibPyMathModules/cmake-build-debug/CMakeFiles/LibPyMathModules.dir/vc140.pdb
 libpymath/LibPyMathModules/cmake-build-debug/CMakeFiles/Progress/1
 libpymath/LibPyMathModules/cmake-build-debug/CMakeFiles/Progress/count.txt
 libpymath/LibPyMathModules/error/__init__.py

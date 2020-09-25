@@ -21,8 +21,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #define PY_SSIZE_T_CLEAN
 
+#define ULM_BLOCKED
+
 #include <libpymath/LibPyMathModules/internalFunctions.h>
-#include <libpymath/LibPyMathModules/BLAS/dgemm.h>
+#include <libpymath/LibPyMathModules/BLAS/dgemm.c>
 #include <libpymath/LibPyMathModules/matrix/doubleFunctions.h>
 
 static PyTypeObject MatrixCoreType;
@@ -34,10 +36,10 @@ static PyTypeObject MatrixCoreType;
 typedef struct {
     PyObject_HEAD
 
-    long int rows;
-    long int cols;
-    long int rowStride;
-    long int colStride;
+    long rows;
+    long cols;
+    long rowStride;
+    long colStride;
     double *data;
 } MatrixCoreObject;
 
@@ -67,8 +69,8 @@ static PyObject *matrixNew(PyTypeObject *type, PyObject *args, PyObject *kwargs)
 }
 
 static int matrixInit(MatrixCoreObject *self, PyObject *args, PyObject *kwargs) {
-    long int r = -1;
-    long int c = -1;
+    long r = -1;
+    long c = -1;
 
     if (!PyArg_ParseTuple(args, "ll", &r, &c))
         return -1;
@@ -109,8 +111,8 @@ static int matrixInit(MatrixCoreObject *self, PyObject *args, PyObject *kwargs) 
 }
 
 static PyObject *matrixGetVal(MatrixCoreObject *self, PyObject *index) {
-    long int i;
-    long int j;
+    long i;
+    long j;
 
     if (!PyArg_ParseTuple(index, "ll", &i, &j))
         return NULL;
@@ -128,8 +130,8 @@ static PyObject *matrixGetVal(MatrixCoreObject *self, PyObject *index) {
 }
 
 static PyObject *matrixSetVal(MatrixCoreObject *self, PyObject *index) {
-    long int i;
-    long int j;
+    long i;
+    long j;
     double val;
 
     if (!PyArg_ParseTuple(index, "lld", &i, &j, &val))
@@ -145,7 +147,7 @@ static PyObject *matrixSetVal(MatrixCoreObject *self, PyObject *index) {
     Py_RETURN_NONE;
 }
 
-static MatrixCoreObject *matrixNewC(double *data, long int rows, long int cols, int t) {
+static MatrixCoreObject *matrixNewC(double *data, long rows, long cols, int t) {
     MatrixCoreObject *res;
 
     /*
@@ -224,7 +226,7 @@ static PyObject *matrixGetColStride(MatrixCoreObject *self, void *closure) {
 }
 
 static PyObject *matrixTransposeMagic(MatrixCoreObject *self) {
-    long int tmp;
+    long tmp;
 
     tmp = self->rowStride;
     self->rowStride = self->colStride;
@@ -239,7 +241,7 @@ static PyObject *matrixTransposeMagic(MatrixCoreObject *self) {
 
 static PyObject *matrixTransposeReturn(MatrixCoreObject *self) {
     double *res = allocateMemory(self->rows * self->cols);
-    long int rows, cols, i, j, rs, cs;
+    long rows, cols, i, j, rs, cs;
     rows = self->rows;
     cols = self->cols;
     rs = self->rowStride;
@@ -266,17 +268,17 @@ static PyObject *matrixProduct(MatrixCoreObject *self, PyObject *args) {
     }
 
     resData = allocateMemory(self->rows * other->cols);
-    long int M = self->rows;
-    long int N = self->cols;
-    long int K = other->cols;
+    long M = self->rows;
+    long N = self->cols;
+    long K = other->cols;
     double alpha = 1.0;
     double beta = 0.0;
     const double *a = self->data;
     const double *b = other->data;
 
-    dgemm("T", "T", &M, &K, &N, &alpha, a, &N, b, &K, &beta, resData, &M);
+    dgemm_("N", "N", &M, &K, &N, &alpha, a, &N, b, &K, &beta, resData, &M);
 
-    PyObject *res = (PyObject *) matrixNewC(resData, other->cols, self->rows, 1);
+    PyObject *res = (PyObject *) matrixNewC(resData, self->rows, other->cols, 0);
 
     return res;
 }
@@ -352,14 +354,14 @@ static PyObject *matrixDivMatrixReturn(MatrixCoreObject *self, PyObject *args) {
 static PyObject *matrixToList(MatrixCoreObject *self, PyObject *args) {
     PyObject *res = PyList_New(self->rows);
     if (res != NULL) {
-        for (long int i = 0; i < self->rows; i++) {
+        for (long i = 0; i < self->rows; i++) {
             PyObject *row = PyList_New(self->cols);
 
             if (row == NULL) {
                 return row;
             }
 
-            for (long int j = 0; j < self->cols; j++) {
+            for (long j = 0; j < self->cols; j++) {
                 PyList_SET_ITEM(row, j, Py_BuildValue("f", self->data[internalGet(i, j, self->rowStride, self->colStride)]));
             }
 
@@ -377,8 +379,8 @@ static PyObject *matrixToList(MatrixCoreObject *self, PyObject *args) {
 static PyObject *matrixFromData2D(MatrixCoreObject *self, PyObject *args) {
     PyObject *matrix;
     double *matrixData;
-    long int rows = -1;
-    long int cols = -1;
+    long rows = -1;
+    long cols = -1;
 
     if (!PyArg_ParseTuple(args, "Oll", &matrix, &rows, &cols))
         return NULL;
@@ -392,11 +394,11 @@ static PyObject *matrixFromData2D(MatrixCoreObject *self, PyObject *args) {
         return NULL;
     }
 
-    for (long int i = 0; i < rows; i++) {
+    for (long i = 0; i < rows; i++) {
         PyObject *row;
         row = PyList_GetItem(matrix, i);
 
-        for (long int j = 0; j < cols; j++) {
+        for (long j = 0; j < cols; j++) {
             PyObject *element = PyList_GetItem(row, j);
 
             if (PyFloat_Check(element))
@@ -416,8 +418,8 @@ static PyObject *matrixFromData2D(MatrixCoreObject *self, PyObject *args) {
 static PyObject *matrixFromData1D(MatrixCoreObject *self, PyObject *args) {
     PyObject *matrix;
     double *matrixData;
-    long int rows = -1;
-    long int cols = -1;
+    long rows = -1;
+    long cols = -1;
 
     if (!PyArg_ParseTuple(args, "Oll", &matrix, &rows, &cols))
         return NULL;
@@ -431,7 +433,7 @@ static PyObject *matrixFromData1D(MatrixCoreObject *self, PyObject *args) {
         return NULL;
     }
 
-    for (long int i = 0; i < rows * cols; i++) {
+    for (long i = 0; i < rows * cols; i++) {
         PyObject *element;
         element = PyList_GetItem(matrix, i);
 
