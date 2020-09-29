@@ -411,11 +411,6 @@ ULMBLAS(dgemm_nn)(long int m,
 
 #else
 
-#include <ulmblas.h>
-#include <stdio.h>
-#include <emmintrin.h>
-#include <immintrin.h>
-
 #define MC  384
 #define KC  384
 #define NC  4096
