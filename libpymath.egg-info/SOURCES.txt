@@ -10,7 +10,7 @@ libpymath/LibPyMathModules/error/errorModule.c
 libpymath/LibPyMathModules/matrix/matrixModule.c
 libpymath/LibPyMathModules/CMakeLists.txt
 libpymath/LibPyMathModules/__init__.py
-libpymath/LibPyMathModules/internalFunctions.h
+libpymath/LibPyMathModules/internal.h
 libpymath/LibPyMathModules/main.c
 libpymath/LibPyMathModules/.idea/.gitignore
 libpymath/LibPyMathModules/.idea/PygonModules.iml
@@ -80,6 +80,5 @@ libpymath/matrix/.idea/inspectionProfiles/Project_Default.xml
 libpymath/matrix/.idea/inspectionProfiles/profiles_settings.xml
 libpymath/matrix/__pycache__/__init__.cpython-38.pyc
 libpymath/matrix/__pycache__/matrix.cpython-38.pyc
-libpymath/testModule/__init__.py
-libpymath/testModule/testScript.py
-libpymath/testModule/__pycache__/__init__.cpython-38.pyc
+libpymath/progress/__init__.py
+libpymath/progress/progress.py

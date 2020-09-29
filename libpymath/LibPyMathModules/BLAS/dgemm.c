@@ -1,3 +1,4 @@
+#include <libpymath/LibPyMathModules/internal.h>
 #include "ulmblas.h"
 #include "xerbla.h"
 #include "dgemm_nn.h"
@@ -244,6 +245,7 @@ F77BLAS(dgemm)(const char *_transA,
 
     if (info != 0) {
         F77BLAS(xerbla)("DGEMM ", &info);
+        PyErr_SetString(PyExc_ValueError, "Invalid value for dgemm_");
     }
 
     ULMBLAS(dgemm)(transA, transB,

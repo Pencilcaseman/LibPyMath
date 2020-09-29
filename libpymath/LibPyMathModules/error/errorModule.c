@@ -21,7 +21,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #define PY_SSIZE_T_CLEAN
 
-#include <libpymath/LibPyMathModules/internalFunctions.h>
+#include <libpymath/LibPyMathModules/internal.h>
 
 // ************************************************************************************************************************* //
 // ==================================================== Error Functions ==================================================== //

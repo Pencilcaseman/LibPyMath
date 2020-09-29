@@ -22,7 +22,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #ifndef LIBPYMATHMODULES_DOUBLEFUNCTIONS_H
 #define LIBPYMATHMODULES_DOUBLEFUNCTIONS_H
 
-#include <libpymath/LibPyMathModules/internalFunctions.h>
+#include <libpymath/LibPyMathModules/internal.h>
 
 void doubleMatrixAddMatrix(const double *a, const double *b, double *c, long long rows, long long cols, long long rowStrideA, long long colStrideA, long long rowStrideB, long long colStrideB, int threads) {
     if (rows * cols < 90000) {

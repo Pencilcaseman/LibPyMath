@@ -45,11 +45,11 @@ def compilerName():
       comp = a
       getnext = False
       continue
-    #separated by space
+    # Separated by space
     if a == '--compiler'  or  re.search('^-[a-z]*c$', a):
       getnext = True
       continue
-    #without space
+    # Without space
     m = re.search('^--compiler=(.+)', a)
     if m == None:
       m = re.search('^-[a-z]*c(.+)', a)
@@ -67,14 +67,14 @@ long_description = (this_directory / 'README.md').read_text(encoding='utf-8')
 def stdCompile():
 	c = compilerName()
 	if c == "msvc":
-		return "/std:c11"
+		return ["/std:c11"]
 	elif c in ("gcc", "g++"):
-		return "-std=c11"
+		return ["-std=c11"]
 	elif c == "clang":
-		return "-std=c11"
+		return ["-std=c11"]
 	elif c == "unix":
-		return "-std=c11"
-	return ""
+		return ["-std=c11"]
+	return []
 
 def openmpCompile():
 	if platform.system() == "Darwin":
@@ -82,104 +82,104 @@ def openmpCompile():
 
 	c = compilerName()
 	if c == "msvc":
-		return "/openmp"
+		return ["/openmp"]
 	elif c in ("gcc", "g++"):
-		return "-fopenmp"
+		return ["-fopenmp"]
 	elif c == "clang":
-		return "-fopenmp"
+		return ["-fopenmp"]
 	elif c == "unix":
-		return "-fopenmp"
-	return ""
+		return ["-fopenmp"]
+	return []
 
 def fpicCompile():
 	if platform.system() == "Darwin":
-		return ""
+		return []
 	
 	c = compilerName()
 	if c == "msvc":
-		return ""
+		return []
 	elif c in ("gcc", "g++"):
 		return "-fpic"
-	elif c == "clang":
+	elif c == ["clang"]:
 		return "-fpic"
 	elif c == "unix":
-		return "-fpic"
-	return ""
+		return ["-fpic"]
+	return []
 
-def o3Compile():	
+def speedCompile():	
 	c = compilerName()
 	if c == "msvc":
-		return "/O2"
+		return ["/O2", "/Ot", "/Ob1"]
 	elif c in ("gcc", "g++"):
-		return "-O3"
+		return ["-O3"]
 	elif c == "clang":
-		return "-O3"
+		return ["-O3"]
 	elif c == "unix":
-		return "-O3"
-	return ""
+		return ["-O3"]
+	return []
 
 def mavxCompile():
 	c = compilerName()
 	if c == "msvc":
-		return ""
+		return []
 	elif c in ("gcc", "g++"):
-		return "-mavx"
+		return ["-mavx"]
 	elif c == "clang":
-		return "-mavx"
+		return ["-mavx"]
 	elif c == "unix":
-		return "-mavx"
-	return ""
+		return ["-mavx"]
+	return []
 
 def m64Compile():
 	if platform.system() != "Linux":
 		c = compilerName()
 		if c == "msvc":
-			return ""
+			return []
 		elif c in ("gcc", "g++"):
-			return "-m64"
+			return ["-m64"]
 		elif c == "clang":
-			return "-m64"
-	return ""
+			return ["-m64"]
+	return []
 
 def favorCompile():
-	if compierName() == "msvc":
+	if compilerName() == "msvc":
 		p = platform.processor().split()[0]
 		if p == "AMD64":
-			return "/favor:AMD64"
+			return ["/favor:AMD64"]
 		elif p == "INTEL64":
-			return "/favor:INTEL64"
+			return ["/favor:INTEL64"]
 		elif p == "ATOM":
-			return "/favor:ATOM"
+			return ["/favor:ATOM"]
 
 def lgompLink():
 	if platform.system() == "Darwin":
-		return ""
+		return []
 	
 	c = compilerName()
 	if c == "msvc":
-		return ""
+		return []
 	elif c in ("gcc", "g++"):
-		return "-lgomp"
+		return ["-lgomp"]
 	elif c == "unix":
-		return "-lgomp"
+		return ["-lgomp"]
 	elif c == "clang":
-		return "-lgomp"
-	return ""
+		return ["-lgomp"]
+	return []
 
 def Wall():	
 	c = compilerName()
 	if c == "msvc":
-		return "-Wall"
+		return ["-Wall"]
 	elif c in ("gcc", "g++"):
-		return "-Wall"
+		return ["-Wall"]
 	elif c == "unix":
-		return "-Wall"
+		return ["-Wall"]
 	elif c == "clang":
-		return "-Wall"
-	return ""
+		return ["-Wall"]
+	return []
 
-compiler_flags = [stdCompile(), openmpCompile(), fpicCompile(), o3Compile(), mavxCompile(), Wall()]
-link_args = [lgompLink()]
+compiler_flags = stdCompile() + openmpCompile() + fpicCompile() + speedCompile() + mavxCompile() + favorCompile() + Wall()
+link_args = lgompLink()
 macros = []
 
 ext_modules = [
@@ -203,13 +203,13 @@ ext_modules = [
 
 setup(
     name="libpymath",
-    version="0.3.6",
+    version="0.3.7",
     description="A general purpose Python math module",
     long_description=long_description,
     long_description_content_type='text/markdown',
     author="Toby Davis",
     author_email="pencilcaseman@gmail.com",
-    url="https://www.github.com/pencilcaseman/gpc",
+    url="https://www.github.com/pencilcaseman/libpymath",
     ext_modules=ext_modules,
     packages=["libpymath"] + ["libpymath." + mod for mod in find_packages("libpymath")],
     license="MIT Licences",

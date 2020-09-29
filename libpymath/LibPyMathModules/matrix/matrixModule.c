@@ -23,7 +23,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #define ULM_BLOCKED
 
-#include <libpymath/LibPyMathModules/internalFunctions.h>
+#include <libpymath/LibPyMathModules/internal.h>
 #include <libpymath/LibPyMathModules/BLAS/dgemm.c>
 #include <libpymath/LibPyMathModules/matrix/doubleFunctions.h>
 
@@ -150,24 +150,8 @@ static PyObject *matrixSetVal(MatrixCoreObject *self, PyObject *index) {
 static MatrixCoreObject *matrixNewC(double *data, long rows, long cols, int t) {
     MatrixCoreObject *res;
 
-    /*
-    double *resData = allocateMemory(rows * cols);
-    if (resData == NULL) {
-        PyErr_SetString(PyExc_MemoryError, "Out of memory");
-        return NULL;
-    }
-
-    memcpy(resData, data, sizeof(double) * rows * cols);
-     */
-
-    // if (PyType_Ready(&MatrixCoreType) < 0) {
-    // free(resData);
-    //     return NULL;
-    // }
-
     res = PyObject_New(MatrixCoreObject, &MatrixCoreType);
     if (res == NULL) {
-        // free(resData);
         return NULL;
     }
 
@@ -225,20 +209,6 @@ static PyObject *matrixGetColStride(MatrixCoreObject *self, void *closure) {
     return PyLong_FromLong(self->colStride);
 }
 
-static PyObject *matrixTransposeMagic(MatrixCoreObject *self) {
-    long tmp;
-
-    tmp = self->rowStride;
-    self->rowStride = self->colStride;
-    self->colStride = tmp;
-
-    tmp = self->rows;
-    self->rows = self->cols;
-    self->cols = tmp;
-
-    Py_RETURN_NONE;
-}
-
 static PyObject *matrixTransposeReturn(MatrixCoreObject *self) {
     double *res = allocateMemory(self->rows * self->cols);
     long rows, cols, i, j, rs, cs;
@@ -276,9 +246,27 @@ static PyObject *matrixProduct(MatrixCoreObject *self, PyObject *args) {
     const double *a = self->data;
     const double *b = other->data;
 
-    dgemm_("N", "N", &M, &K, &N, &alpha, a, &N, b, &K, &beta, resData, &M);
+    PyObject *res;
 
-    PyObject *res = (PyObject *) matrixNewC(resData, self->rows, other->cols, 0);
+    if (M * N * K > 15000) {
+        // dgemm_("N", "N", &M, &K, &N, &alpha, a, &N, b, &K, &beta, resData, &M);
+        dgemm_("N", "N", &M, &K, &N, &alpha, a, &M, b, &N, &beta, resData, &M);
+        res = (PyObject *) matrixNewC(resData, self->rows, other->cols, 0);
+    } else {
+        long int i, j, k;
+
+        for (i = 0; i < M; i++) {
+            for (j = 0; j < K; j++) {
+                double tmp = 0;
+                for (k = 0; k < N; k++) {
+                    tmp += a[k + i * N] * b[j + k * K];
+                }
+                resData[j + i * K] = tmp;
+            }
+        }
+
+        res = (PyObject *) matrixNewC(resData, self->rows, other->cols, 0);
+    }
 
     return res;
 }
@@ -467,7 +455,6 @@ static PyMethodDef matrixMethods[] = {
         {"set",                   (PyCFunction) matrixSetVal,          METH_VARARGS, "Get a value in the matrix"},
         {"toString",              (PyCFunction) matrixToString,        METH_NOARGS,  "Give the matrix object as a string"},
         {"copy",                  (PyCFunction) matrixCopy,            METH_NOARGS,  "Return an exact copy of a matrix"},
-        {"transposeMagic",        (PyCFunction) matrixTransposeMagic,  METH_NOARGS,  "Transpose the matrix instantly by swapping the rows and columns and the row and column stride"},
         {"transpose",             (PyCFunction) matrixTransposeReturn, METH_NOARGS,  "Transpose the matrix and return the result. This function actually swaps the data around"},
         {"matrixProduct",         (PyCFunction) matrixProduct,         METH_VARARGS, "Calculate the matrix product between two matrices and return the result"},
         {"matrixAddMatrixReturn", (PyCFunction) matrixAddMatrixReturn, METH_VARARGS, "Add one matrix to another and return the result"},
