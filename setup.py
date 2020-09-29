@@ -78,7 +78,7 @@ def stdCompile():
 
 def openmpCompile():
 	if platform.system() == "Darwin":
-		return ""
+		return []
 
 	c = compilerName()
 	if c == "msvc":
@@ -150,6 +150,7 @@ def favorCompile():
 			return ["/favor:INTEL64"]
 		elif p == "ATOM":
 			return ["/favor:ATOM"]
+	return []
 
 def lgompLink():
 	if platform.system() == "Darwin":
@@ -203,7 +204,7 @@ ext_modules = [
 
 setup(
     name="libpymath",
-    version="0.3.7",
+    version="0.3.8",
     description="A general purpose Python math module",
     long_description=long_description,
     long_description_content_type='text/markdown',
