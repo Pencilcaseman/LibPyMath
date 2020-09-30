@@ -82,3 +82,4 @@ libpymath/matrix/__pycache__/__init__.cpython-38.pyc
 libpymath/matrix/__pycache__/matrix.cpython-38.pyc
 libpymath/progress/__init__.py
 libpymath/progress/progress.py
+libpymath/progress/__pycache__/progress.cpython-38.pyc

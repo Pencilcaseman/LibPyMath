@@ -3,8 +3,10 @@ from collections.abc import Iterable
 import time
 import shutil
 
+__all__ = ["CharSet", "charsets", "Progress"]
+
 class CharSet:
-	def __init__(self, fill="█", blank=" ", half="▍"):
+	def __init__(self, fill="#", blank=" ", half=" "):
 		self.fill = fill
 		self.blank = blank
 		self.half = half
@@ -20,6 +22,11 @@ class CharSet:
 		res += self.blank * (length - len(res))
 
 		return res
+
+charsets = {
+	"ascii": CharSet("#", "L", "_"),
+	"unicode": CharSet("█", "░", "▒"),
+}
 
 class Progress:
 	def __init__(self, iter=None, start=None, end=None, step=None, charset=None):
@@ -81,7 +88,7 @@ class Progress:
 			self.len = len(iter)
 
 		if charset is None:
-			self.charset = CharSet()
+			self.charset = charsets["unicode"]
 		elif isinstance(charset, CharSet):
 			self.charset = charset
 

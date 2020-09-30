@@ -27,6 +27,9 @@ import os
 from time import time
 
 
+__all__ = ["Matrix"]
+
+
 class Matrix:
     def __init__(self, rows=None, cols=None, data=None, dtype="float64", threads=None, internal_new=False):
         self.__safe_for_unpickling__ = True
