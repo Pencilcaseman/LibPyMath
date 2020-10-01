@@ -19,8 +19,6 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#define PY_SSIZE_T_CLEAN
-
 #define ULM_BLOCKED
 
 #include <libpymath/LibPyMathModules/internal.h>
@@ -126,7 +124,7 @@ static PyObject *matrixGetVal(MatrixCoreObject *self, PyObject *index) {
         return NULL;
     }
 
-    return Py_BuildValue("f", res);
+    return Py_BuildValue("d", res);
 }
 
 static PyObject *matrixSetVal(MatrixCoreObject *self, PyObject *index) {
@@ -339,6 +337,74 @@ static PyObject *matrixDivMatrixReturn(MatrixCoreObject *self, PyObject *args) {
     return res;
 }
 
+static PyObject *matrixAddScalarReturn(MatrixCoreObject *self, PyObject *args) {
+    double other;
+    double *resData;
+    int threads = 1;
+
+    if (!PyArg_ParseTuple(args, "d|i", &other, &threads)) {
+        return NULL;
+    }
+
+    resData = allocateMemory(self->rows * self->cols);
+    doubleMatrixAddScalar(self->data, other, resData, self->rows, self->cols, self->rowStride, self->colStride, threads);
+
+    PyObject *res = (PyObject *) matrixNewC(resData, self->rows, self->cols, self->colStride != 1);
+
+    return res;
+}
+
+static PyObject *matrixSubScalarReturn(MatrixCoreObject *self, PyObject *args) {
+    double other;
+    double *resData;
+    int threads = 8;
+
+    if (!PyArg_ParseTuple(args, "d|i", &other, &threads)) {
+        return NULL;
+    }
+
+    resData = allocateMemory(self->rows * self->cols);
+    doubleMatrixSubScalar(self->data, other, resData, self->rows, self->cols, self->rowStride, self->colStride, threads);
+
+    PyObject *res = (PyObject *) matrixNewC(resData, self->rows, self->cols, self->colStride != 1);
+
+    return res;
+}
+
+static PyObject *matrixMulScalarReturn(MatrixCoreObject *self, PyObject *args) {
+    double other;
+    double *resData;
+    int threads = 8;
+
+    if (!PyArg_ParseTuple(args, "d|i", &other, &threads)) {
+        return NULL;
+    }
+
+    resData = allocateMemory(self->rows * self->cols);
+    doubleMatrixMulScalar(self->data, other, resData, self->rows, self->cols, self->rowStride, self->colStride, threads);
+
+    PyObject *res = (PyObject *) matrixNewC(resData, self->rows, self->cols, self->colStride != 1);
+
+    return res;
+}
+
+static PyObject *matrixDivScalarReturn(MatrixCoreObject *self, PyObject *args) {
+    double other;
+    double *resData;
+    int threads = 8;
+
+    if (!PyArg_ParseTuple(args, "d|i", &other, &threads)) {
+        return NULL;
+    }
+
+    resData = allocateMemory(self->rows * self->cols);
+    doubleMatrixDivScalar(self->data, other, resData, self->rows, self->cols, self->rowStride, self->colStride, threads);
+
+    PyObject *res = (PyObject *) matrixNewC(resData, self->rows, self->cols, self->colStride != 1);
+
+    return res;
+}
+
 static PyObject *matrixToList(MatrixCoreObject *self, PyObject *args) {
     PyObject *res = PyList_New(self->rows);
     if (res != NULL) {
@@ -350,7 +416,7 @@ static PyObject *matrixToList(MatrixCoreObject *self, PyObject *args) {
             }
 
             for (long j = 0; j < self->cols; j++) {
-                PyList_SET_ITEM(row, j, Py_BuildValue("f", self->data[internalGet(i, j, self->rowStride, self->colStride)]));
+                PyList_SET_ITEM(row, j, Py_BuildValue("d", self->data[internalGet(i, j, self->rowStride, self->colStride)]));
             }
 
             PyList_SET_ITEM(res, i, row);
@@ -461,6 +527,10 @@ static PyMethodDef matrixMethods[] = {
         {"matrixSubMatrixReturn", (PyCFunction) matrixSubMatrixReturn, METH_VARARGS, "Subtract one matrix from another and return the result"},
         {"matrixMulMatrixReturn", (PyCFunction) matrixMulMatrixReturn, METH_VARARGS, "Multiply one matrix by another and return the result"},
         {"matrixDivMatrixReturn", (PyCFunction) matrixDivMatrixReturn, METH_VARARGS, "Divide one matrix by another and return the result"},
+        {"matrixAddScalarReturn", (PyCFunction) matrixAddScalarReturn, METH_VARARGS, "Add a single scalar value to every element in a matrix and return the result"},
+        {"matrixSubScalarReturn", (PyCFunction) matrixSubScalarReturn, METH_VARARGS, "Subtract a scalar value from every element in a matrix and return the result"},
+        {"matrixMulScalarReturn", (PyCFunction) matrixMulScalarReturn, METH_VARARGS, "Multiply every element in a matrix by a scalar value and return the result"},
+        {"matrixDivScalarReturn", (PyCFunction) matrixDivScalarReturn, METH_VARARGS, "Divide every element in a matrix by a scalar value and return the result"},
         {"matrixToList",          (PyCFunction) matrixToList,          METH_NOARGS,  "Return the matrix represented as a 2D python list"},
         {NULL}
 };

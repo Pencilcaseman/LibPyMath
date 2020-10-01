@@ -195,26 +195,46 @@ class Matrix:
     def __add__(self, other):
         if isinstance(other, Matrix) and self.matrix.rows == other.matrix.rows and self.matrix.cols == other.matrix.cols:
             return Matrix._internal_new(self.matrix.matrixAddMatrixReturn(other.matrix, self.threads), self.dtype, self.threads)
+        elif isinstance(other, (int, float)):
+            return Matrix._internal_new(self.matrix.matrixAddScalarReturn(other, self.threads), self.dtype, self.threads)
         else:
             raise Exception("Invalid matrix size for matrix addition") from TypeError
 
     def __sub__(self, other):
-        if instance(other, Matrix) and self.matrix.rows == other.matrix.rows and self.matrix.cols == other.matrix.cols:
+        if isinstance(other, Matrix) and self.matrix.rows == other.matrix.rows and self.matrix.cols == other.matrix.cols:
             return Matrix._internal_new(self.matrix.matrixSubMatrixReturn(other.matrix, self.threads), self.dtype, self.threads)
+        elif isinstance(other, (int, float)):
+            return Matrix._internal_new(self.matrix.matrixSubScalarReturn(other, self.threads), self.dtype, self.threads)
         else:
             raise Exception("Invalid matrix size for matrix subtraction") from TypeError
 
     def __mul__(self, other):
-        if instance(other, Matrix) and self.matrix.rows == other.matrix.rows and self.matrix.cols == other.matrix.cols:
+        if isinstance(other, Matrix) and self.matrix.rows == other.matrix.rows and self.matrix.cols == other.matrix.cols:
             return Matrix._internal_new(self.matrix.matrixMulMatrixReturn(other.matrix, self.threads), self.dtype, self.threads)
+        elif isinstance(other, (int, float)):
+            return Matrix._internal_new(self.matrix.matrixMulScalarReturn(other, self.threads), self.dtype, self.threads)
         else:
             raise Exception("Invalid matrix size for matrix multiplication") from TypeError
 
     def __truediv__(self, other):
-        if instance(other, Matrix) and self.matrix.rows == other.matrix.rows and self.matrix.cols == other.matrix.cols:
+        if isinstance(other, Matrix) and self.matrix.rows == other.matrix.rows and self.matrix.cols == other.matrix.cols:
             return Matrix._internal_new(self.matrix.matrixDivMatrixReturn(other.matrix, self.threads), self.dtype, self.threads)
+        elif isinstance(other, (int, float)):
+            return Matrix._internal_new(self.matrix.matrixDivScalarReturn(other, self.threads), self.dtype, self.threads)
         else:
             raise Exception("Invalid matrix size for matrix division") from TypeError
+
+    def __iadd__(self, other):
+        return self + other
+
+    def __isub__(self, other):
+        return self - other
+
+    def __imul__(self, other):
+        return self * other
+
+    def __itruediv__(self, other):
+        return self / other
 
     # TODO: Make this return a vector of the relevant row -- i.e. matrix[0] -> [1, 2, 3]
     def __getitem__(self, pos):
