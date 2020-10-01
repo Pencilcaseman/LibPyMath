@@ -242,11 +242,3 @@ class Progress:
 			self.update()
 
 		print(self._eval())
-
-
-loops = 10000000
-start = time.time()
-for i in Progress(range(loops), smoothness=0.95):
-	pass
-end = time.time()
-print(end - start)
