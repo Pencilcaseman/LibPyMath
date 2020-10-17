@@ -3,7 +3,7 @@
 
 #include <libpymath/src/internal.h>
 
-void doubleMatrixAddMatrix(const double *a, const double *b, double *c, const long int rows, long long cols, const long int rowStrideA, const long int colStrideA, const long int rowStrideB, const long int colStrideB, int threads) {
+void doubleMatrixAddMatrix(double *a, double *b, double *c, long int rows, long long cols, long int rowStrideA, long int colStrideA, long int rowStrideB, long int colStrideB, int threads) {
     if (rows * cols < 90000) {
         long long i, j;
         for (i = 0; i < rows; i++) {
@@ -40,7 +40,7 @@ void doubleMatrixAddMatrix(const double *a, const double *b, double *c, const lo
     }
 }
 
-void doubleMatrixSubMatrix(const double *a, const double *b, double *c, const long int rows, long long cols, const long int rowStrideA, const long int colStrideA, const long int rowStrideB, const long int colStrideB, int threads) {
+void doubleMatrixSubMatrix(double *a, double *b, double *c, long int rows, long long cols, long int rowStrideA, long int colStrideA, long int rowStrideB, long int colStrideB, int threads) {
     if (rows * cols < 90000) {
         long long i, j;
         for (i = 0; i < rows; i++) {
@@ -77,7 +77,7 @@ void doubleMatrixSubMatrix(const double *a, const double *b, double *c, const lo
     }
 }
 
-void doubleMatrixMulMatrix(const double *a, const double *b, double *c, const long int rows, long long cols, const long int rowStrideA, const long int colStrideA, const long int rowStrideB, const long int colStrideB, int threads) {
+void doubleMatrixMulMatrix(double *a, double *b, double *c, long int rows, long long cols, long int rowStrideA, long int colStrideA, long int rowStrideB, long int colStrideB, int threads) {
     if (rows * cols < 90000) {
         long long i, j;
         for (i = 0; i < rows; i++) {
@@ -114,7 +114,7 @@ void doubleMatrixMulMatrix(const double *a, const double *b, double *c, const lo
     }
 }
 
-void doubleMatrixDivMatrix(const double *a, const double *b, double *c, const long int rows, long long cols, const long int rowStrideA, const long int colStrideA, const long int rowStrideB, const long int colStrideB, int threads) {
+void doubleMatrixDivMatrix(double *a, double *b, double *c, long int rows, long long cols, long int rowStrideA, long int colStrideA, long int rowStrideB, long int colStrideB, int threads) {
     if (rows * cols < 90000) {
         long long i, j;
         for (i = 0; i < rows; i++) {
@@ -151,7 +151,7 @@ void doubleMatrixDivMatrix(const double *a, const double *b, double *c, const lo
     }
 }
 
-void doubleMatrixAddScalar(const double *a, const double b, double *c, const long int rows, long long cols, const long int rowStrideA, const long int colStrideA, int threads) {
+void doubleMatrixAddScalar(double *a, double b, double *c, long int rows, long long cols, long int rowStrideA, long int colStrideA, int threads) {
     if (rows * cols < 90000) {
         long long i, j;
         for (i = 0; i < rows; i++) {
@@ -188,7 +188,7 @@ void doubleMatrixAddScalar(const double *a, const double b, double *c, const lon
     }
 }
 
-void doubleMatrixSubScalar(const double *a, const double b, double *c, const long int rows, long long cols, const long int rowStrideA, const long int colStrideA, int threads) {
+void doubleMatrixSubScalar(double *a, double b, double *c, long int rows, long long cols, long int rowStrideA, long int colStrideA, int threads) {
     if (rows * cols < 90000) {
         long long i, j;
         for (i = 0; i < rows; i++) {
@@ -225,7 +225,7 @@ void doubleMatrixSubScalar(const double *a, const double b, double *c, const lon
     }
 }
 
-void doubleMatrixMulScalar(const double *a, const double b, double *c, const long int rows, long long cols, const long int rowStrideA, const long int colStrideA, int threads) {
+void doubleMatrixMulScalar(double *a, double b, double *c, long int rows, long long cols, long int rowStrideA, long int colStrideA, int threads) {
     if (rows * cols < 90000) {
         long long i, j;
         for (i = 0; i < rows; i++) {
@@ -262,7 +262,7 @@ void doubleMatrixMulScalar(const double *a, const double b, double *c, const lon
     }
 }
 
-void doubleMatrixDivScalar(const double *a, const double b, double *c, const long int rows, long long cols, const long int rowStrideA, const long int colStrideA, int threads) {
+void doubleMatrixDivScalar(double *a, double b, double *c, long int rows, long long cols, long int rowStrideA, long int colStrideA, int threads) {
     if (rows * cols < 90000) {
         long long i, j;
         for (i = 0; i < rows; i++) {
@@ -299,7 +299,7 @@ void doubleMatrixDivScalar(const double *a, const double b, double *c, const lon
     }
 }
 
-void doubleMatrixFillScalar(double *a, const double scalar, const long int rows, long long cols, const long int rowStrideA, const long int colStrideA, int threads) {
+void doubleMatrixFillScalar(double *a, double scalar, long int rows, long long cols, long int rowStrideA, long int colStrideA, int threads) {
     if (rows * cols < 90000) {
         long long i, j;
         for (i = 0; i < rows; i++) {
@@ -336,12 +336,12 @@ void doubleMatrixFillScalar(double *a, const double scalar, const long int rows,
     }
 }
 
-void doubleMatrixFillAscending(double *a, const long int rows, long long cols, const long int rowStrideA, const long int colStrideA, int threads) {
+void doubleMatrixFillAscending(double *a, long int rows, long long cols, long int rowStrideA, long int colStrideA, int threads) {
     if (rows * cols < 90000) {
         long long i, j;
         for (i = 0; i < rows; i++) {
             for (j = 0; j < cols - 3; j += 4) {
-                const double fill = (double) (j + i * cols);
+                double fill = (double) (j + i * cols);
                 a[internalGet(i, j, rowStrideA, colStrideA)] = fill;
                 a[internalGet(i, j, rowStrideA, colStrideA) + 1] = fill + 1;
                 a[internalGet(i, j, rowStrideA, colStrideA) + 2] = fill + 2;
@@ -361,7 +361,7 @@ void doubleMatrixFillAscending(double *a, const long int rows, long long cols, c
 #		pragma omp parallel for private(i, j) shared(a, rows, cols, rowStrideA, colStrideA) default(none)
         for (i = 0; i < rows; i++) {
             for (j = 0; j < cols - 3; j += 4) {
-                const double fill = (double) (j + i * cols);
+                double fill = (double) (j + i * cols);
                 a[internalGet(i, j, rowStrideA, colStrideA)] = fill;
                 a[internalGet(i, j, rowStrideA, colStrideA) + 1] = fill + 1;
                 a[internalGet(i, j, rowStrideA, colStrideA) + 2] = fill + 2;
@@ -375,14 +375,14 @@ void doubleMatrixFillAscending(double *a, const long int rows, long long cols, c
     }
 }
 
-void doubleMatrixFillDescending(double *a, const long int rows, long long cols, const long int rowStrideA, const long int colStrideA, int threads) {
-    const double max = (double) (rows * cols) - 1;
+void doubleMatrixFillDescending(double *a, long int rows, long long cols, long int rowStrideA, long int colStrideA, int threads) {
+    double max = (double) (rows * cols) - 1;
 
     if (rows * cols < 90000) {
         long long i, j;
         for (i = 0; i < rows; i++) {
             for (j = 0; j < cols - 3; j += 4) {
-                const double fill = (double) (j + i * cols);
+                double fill = (double) (j + i * cols);
                 a[internalGet(i, j, rowStrideA, colStrideA)] = max - fill;
                 a[internalGet(i, j, rowStrideA, colStrideA) + 1] = max - (fill + 1);
                 a[internalGet(i, j, rowStrideA, colStrideA) + 2] = max - (fill + 2);
@@ -402,7 +402,7 @@ void doubleMatrixFillDescending(double *a, const long int rows, long long cols, 
 #		pragma omp parallel for private(i, j) shared(a, rows, cols, rowStrideA, colStrideA) default(none)
         for (i = 0; i < rows; i++) {
             for (j = 0; j < cols - 3; j += 4) {
-                const double fill = (double) (j + i * cols);
+                double fill = (double) (j + i * cols);
                 a[internalGet(i, j, rowStrideA, colStrideA)] = max - fill;
                 a[internalGet(i, j, rowStrideA, colStrideA) + 1] = max - (fill + 1);
                 a[internalGet(i, j, rowStrideA, colStrideA) + 2] = max - (fill + 2);
@@ -416,12 +416,12 @@ void doubleMatrixFillDescending(double *a, const long int rows, long long cols, 
     }
 }
 
-void doubleMatrixFillRandomRange(double *a, const double min, const double max, const long int rows, long long cols, const long int rowStrideA, const long int colStrideA, int threads) {
+void doubleMatrixFillRandomRange(double *a, double min, double max, long int rows, long long cols, long int rowStrideA, long int colStrideA, int threads) {
     if (rows * cols < 90000) {
         long long i, j;
         for (i = 0; i < rows; i++) {
             for (j = 0; j < cols - 3; j += 4) {
-                const double fill = (double) (j + i * cols);
+                double fill = (double) (j + i * cols);
                 a[internalGet(i, j, rowStrideA, colStrideA)] = randomRange(min, max);
                 a[internalGet(i, j, rowStrideA, colStrideA) + 1] = randomRange(min, max);
                 a[internalGet(i, j, rowStrideA, colStrideA) + 2] = randomRange(min, max);
@@ -441,7 +441,7 @@ void doubleMatrixFillRandomRange(double *a, const double min, const double max, 
 #		pragma omp parallel for private(i, j) shared(a, min, max, rows, cols, rowStrideA, colStrideA) default(none)
         for (i = 0; i < rows; i++) {
             for (j = 0; j < cols - 3; j += 4) {
-                const double fill = (double) (j + i * cols);
+                double fill = (double) (j + i * cols);
                 a[internalGet(i, j, rowStrideA, colStrideA)] = randomRange(min, max);
                 a[internalGet(i, j, rowStrideA, colStrideA) + 1] = randomRange(min, max);
                 a[internalGet(i, j, rowStrideA, colStrideA) + 2] = randomRange(min, max);
@@ -465,7 +465,7 @@ void doubleMatrixFillRandomRange(double *a, const double min, const double max, 
 #define D_RELU(x) ((x) > 0 ? 1 : 0)
 #define D_LEAKY_RELU(x) ((x) > 0 ? 1 : 0.2)
 
-void doubleMatrixMapSigmoid(double *a, const long int rows, long long cols, const long int rowStrideA, const long int colStrideA, int threads) {
+void doubleMatrixMapSigmoid(double *a, long int rows, long long cols, long int rowStrideA, long int colStrideA, int threads) {
     if (rows * cols < 90000) {
         long long i, j;
         for (i = 0; i < rows; i++) {
@@ -502,7 +502,7 @@ void doubleMatrixMapSigmoid(double *a, const long int rows, long long cols, cons
     }
 }
 
-void doubleMatrixMapTanh(double *a, const long int rows, long long cols, const long int rowStrideA, const long int colStrideA, int threads) {
+void doubleMatrixMapTanh(double *a, long int rows, long long cols, long int rowStrideA, long int colStrideA, int threads) {
     if (rows * cols < 90000) {
         long long i, j;
         for (i = 0; i < rows; i++) {
@@ -539,7 +539,7 @@ void doubleMatrixMapTanh(double *a, const long int rows, long long cols, const l
     }
 }
 
-void doubleMatrixMapRELU(double *a, const long int rows, long long cols, const long int rowStrideA, const long int colStrideA, int threads) {
+void doubleMatrixMapRELU(double *a, long int rows, long long cols, long int rowStrideA, long int colStrideA, int threads) {
     if (rows * cols < 90000) {
         long long i, j;
         for (i = 0; i < rows; i++) {
@@ -576,7 +576,7 @@ void doubleMatrixMapRELU(double *a, const long int rows, long long cols, const l
     }
 }
 
-void doubleMatrixMapLeakyRELU(double *a, const long int rows, long long cols, const long int rowStrideA, const long int colStrideA, int threads) {
+void doubleMatrixMapLeakyRELU(double *a, long int rows, long long cols, long int rowStrideA, long int colStrideA, int threads) {
     if (rows * cols < 90000) {
         long long i, j;
         for (i = 0; i < rows; i++) {
@@ -613,7 +613,7 @@ void doubleMatrixMapLeakyRELU(double *a, const long int rows, long long cols, co
     }
 }
 
-void doubleMatrixMapSigmoidDerivative(double *a, const long int rows, long long cols, const long int rowStrideA, const long int colStrideA, int threads) {
+void doubleMatrixMapSigmoidDerivative(double *a, long int rows, long long cols, long int rowStrideA, long int colStrideA, int threads) {
     if (rows * cols < 90000) {
         long long i, j;
         for (i = 0; i < rows; i++) {
@@ -650,7 +650,7 @@ void doubleMatrixMapSigmoidDerivative(double *a, const long int rows, long long 
     }
 }
 
-void doubleMatrixMapTanhDerivative(double *a, const long int rows, long long cols, const long int rowStrideA, const long int colStrideA, int threads) {
+void doubleMatrixMapTanhDerivative(double *a, long int rows, long long cols, long int rowStrideA, long int colStrideA, int threads) {
     if (rows * cols < 90000) {
         long long i, j;
         for (i = 0; i < rows; i++) {
@@ -687,7 +687,7 @@ void doubleMatrixMapTanhDerivative(double *a, const long int rows, long long col
     }
 }
 
-void doubleMatrixMapRELUDerivative(double *a, const long int rows, long long cols, const long int rowStrideA, const long int colStrideA, int threads) {
+void doubleMatrixMapRELUDerivative(double *a, long int rows, long long cols, long int rowStrideA, long int colStrideA, int threads) {
     if (rows * cols < 90000) {
         long long i, j;
         for (i = 0; i < rows; i++) {
@@ -724,7 +724,7 @@ void doubleMatrixMapRELUDerivative(double *a, const long int rows, long long col
     }
 }
 
-void doubleMatrixMapLeakyRELUDerivative(double *a, const long int rows, long long cols, const long int rowStrideA, const long int colStrideA, int threads) {
+void doubleMatrixMapLeakyRELUDerivative(double *a, long int rows, long long cols, long int rowStrideA, long int colStrideA, int threads) {
     if (rows * cols < 90000) {
         long long i, j;
         for (i = 0; i < rows; i++) {
