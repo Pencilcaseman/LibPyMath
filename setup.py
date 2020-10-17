@@ -35,6 +35,8 @@ except ImportError:
                 if "__init__.py" in fils]
 
 def compilerName():
+  return "gcc"
+
   import re
   import distutils.ccompiler
   comp = distutils.ccompiler.get_default_compiler()
@@ -99,7 +101,7 @@ def fpicCompile():
 	if c == "msvc":
 		return []
 	elif c in ("gcc", "g++"):
-		return "-fpic"
+		return ["-fpic"]
 	elif c == ["clang"]:
 		return "-fpic"
 	elif c == "unix":
@@ -182,11 +184,12 @@ def Wall():
 compiler_flags = stdCompile() + openmpCompile() + fpicCompile() + speedCompile() + mavxCompile() + favorCompile() + Wall()
 link_args = lgompLink()
 macros = []
+print(compiler_flags)
 
 ext_modules = [
     Extension(
         "libpymath.error",
-        ["libpymath/LibPyMathModules/error/errorModule.c"],
+        ["libpymath/src/error/error.c"],
         extra_compile_args=compiler_flags,
         extra_link_args=link_args,
         define_macros=macros,
@@ -194,7 +197,7 @@ ext_modules = [
     ),
     Extension(
         "libpymath.core.matrix",
-        ["libpymath/LibPyMathModules/matrix/matrixModule.c"],
+        ["libpymath/src/matrix/matrix.c"],
         extra_compile_args=compiler_flags,
         extra_link_args=link_args,
         define_macros=macros,
@@ -204,7 +207,7 @@ ext_modules = [
 
 setup(
     name="libpymath",
-    version="0.4.2",
+    version="0.5.0",
     description="A general purpose Python math module",
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -227,5 +230,6 @@ setup(
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
     ],
 )

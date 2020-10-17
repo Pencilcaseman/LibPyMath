@@ -1,4 +1,0 @@
-C:\Users\penci\AppData\Local\JetBrains\Toolbox\apps\CLion\ch-0\202.6948.80\bin\cmake\win\bin\cmake.exe -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - NMake Makefiles" C:\Users\penci\OneDrive\Desktop\LibPyMath\LibPyMath\libpymath\LibPyMathModules
--- Configuring done
--- Generating done
--- Build files have been written to: C:/Users/penci/OneDrive/Desktop/LibPyMath/LibPyMath/libpymath/LibPyMathModules/cmake-build-debug

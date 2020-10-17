@@ -1,4 +1,5 @@
 import os
+import sys
 import math
 from collections.abc import Iterable
 import shutil
@@ -42,16 +43,24 @@ class frange:
 		raise IndexError("Index out of range")
 
 class Progress:
-	def __init__(self, iterable=None, start=None, end=None, step=None, smoothness=0.85):
+	def __init__(self, iterable=None, message=None, erase=False, start=None, end=None, step=None, smoothness=0.85):
 		self.iterable = None
+		self.message = None
 		self.start = None
 		self.end = None
 		self.step = None
 		self.length = None
 		self.smoothness = smoothness
+		self.erase = erase
 
 		self.fillChar = "█"
 		self.emptyChar = "█"
+
+		# Provide a special update routine for IDLE, in which carriage return does not work
+		self.idleUpdate = None
+
+		if isinstance(message, str):
+			self.message = message
 
 		if isinstance(iterable, Iterable):
 			# Use an iterable
@@ -102,6 +111,11 @@ class Progress:
 			self.maxLen = len(str(self.iterable[-1])) + 1
 		elif self.end is not None:
 			self.maxLen = len(str(self.end)) + 1
+
+
+		if "idlelib.run" in sys.modules:
+			# Running in IDLE
+			self.idleUpdate = len(self.iterable) // shutil.get_terminal_size(fallback=(120, 50)).columns
 
 	def reset(self):
 		self.iterStart = time.perf_counter()
@@ -164,7 +178,9 @@ class Progress:
 		timing = "[{}:{}|{}:{}, {}{}]".format(self.currentMinutes, self.currentSeconds, self.remainingMinutes, self.remainingSeconds, self.iterationsPerSecond, self.iterationsPerSecondTxt)
 
 		# Bar properties
-		barWidth = self.termWidth - len(percentage) - len(fraction) - len(timing) - 3
+		messageWidth = len(self.message) + 2 if self.message is not None else 0
+
+		barWidth = self.termWidth - messageWidth - len(percentage) - len(fraction) - len(timing) - 3
 		usePercentage = True
 		useFraction = True
 		useTiming = True
@@ -195,7 +211,8 @@ class Progress:
 								   self.emptyChar)
 
 		# return percentage + "|" + bar + "| " + fraction + " " + timing
-		res = percentage if usePercentage else ""
+		res = self.message + " |" if self.message is not None else ""
+		res += percentage if usePercentage else ""
 		res += "|"
 		res += bar
 		res += "|"
@@ -239,6 +256,19 @@ class Progress:
 		for value in self.iterable:
 			yield value
 
-			self.update()
+			if self.idleUpdate is None:
+				self.update()
+			else:
+				self.iterCount += 1
+				if self.iterCount % self.idleUpdate == 0:
+					print("#", end="")
 
-		print(self._eval())
+		if self.idleUpdate is None:
+			if not self.erase:
+				print(self._eval(), end="")
+			else:
+				print("\r", end="")
+				print(" " * shutil.get_terminal_size(fallback=(120, 50)).columns, end="")
+				print("\r", end="")
+		else:
+			print("")

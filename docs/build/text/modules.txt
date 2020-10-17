@@ -1,0 +1,30 @@
+libpymath
+*********
+
+* libpymath package
+
+  * Subpackages
+
+    * libpymath.matrix package
+
+      * Submodules
+
+      * libpymath.matrix.matrix module
+
+      * Module contents
+
+    * libpymath.progress package
+
+      * Submodules
+
+      * libpymath.progress.progress module
+
+      * Module contents
+
+    * libpymath.src package
+
+      * Subpackages
+
+      * Module contents
+
+  * Module contents

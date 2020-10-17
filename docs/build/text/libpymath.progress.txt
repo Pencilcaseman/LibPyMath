@@ -1,0 +1,28 @@
+libpymath.progress package
+**************************
+
+
+Submodules
+==========
+
+
+libpymath.progress.progress module
+==================================
+
+class libpymath.progress.progress.Progress(iterable=None, message=None, erase=False, start=None, end=None, step=None, smoothness=0.85)
+
+   Bases: "object"
+
+   static generateBar(fill, length, fillChar='█', emptyChar='█')
+
+   reset()
+
+   update()
+
+class libpymath.progress.progress.frange(start, end=None, step=None)
+
+   Bases: "object"
+
+
+Module contents
+===============

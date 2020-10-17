@@ -1,0 +1,324 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Libpymath Matrix Module Documentation &mdash; libpymath 0.5.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Libpymath Documentation" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> libpymath
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Libpymath Matrix Module Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#importing-the-module">Importing the Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#creating-a-matrix">Creating a Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#printing-a-matrix">Printing a Matrix</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">libpymath</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Libpymath Matrix Module Documentation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/matrix.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="libpymath-matrix-module-documentation">
+<h1>Libpymath Matrix Module Documentation<a class="headerlink" href="#libpymath-matrix-module-documentation" title="Permalink to this headline">¶</a></h1>
+<p>Libpymath’s matrix library is a fast and powerful means of accessing complex mathematical routines through a simple to use interface. The matrix library is also expanding rapidly, with new features being added with nearly every major version of libpymath.</p>
+<p>When you import the module for the first time, some tests will be run to detect the optimal number of threads to use for certain matrix calculations. It only takes a few seconds and results in the library being even faster!</p>
+<div class="section" id="importing-the-module">
+<h2>Importing the Module<a class="headerlink" href="#importing-the-module" title="Permalink to this headline">¶</a></h2>
+<p>To use the matrix module, you can import it like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Explicitly import the module</span>
+<span class="kn">from</span> <span class="nn">libpymath</span> <span class="kn">import</span> <span class="n">matrix</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">Matrix</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># Use the module through a &lt;libpymath&gt; import</span>
+<span class="kn">import</span> <span class="nn">libpymath</span> <span class="k">as</span> <span class="nn">lpm</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">lpm</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">Matrix</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<span class="target" id="module-libpymath.matrix.matrix"></span><p>Copyright 2020 Toby Davis</p>
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the “Software”), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
+so, subject to the following conditions:</p>
+<p>The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.</p>
+<p>THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+</div>
+<div class="section" id="creating-a-matrix">
+<h2>Creating a Matrix<a class="headerlink" href="#creating-a-matrix" title="Permalink to this headline">¶</a></h2>
+<p>As you have seen in the section above, creating a matrix is extremely easy, though there are many different ways of doing this.</p>
+<p>The easiest way to create a matrix is simply to give the rows and columns like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">libpymath</span> <span class="k">as</span> <span class="nn">lpm</span>
+
+<span class="c1"># Create a 2x3 matrix</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">lpm</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">Matrix</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Matrices can also be created by providing a 2-dimensional Python list of data:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">libpymath</span> <span class="k">as</span> <span class="nn">lpm</span>
+
+<span class="c1"># The data for the matrix</span>
+<span class="c1"># data = [[1, 2, 3],</span>
+<span class="c1">#         [4, 5, 6]]</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">lpm</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">Matrix</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If a 1-dimensional list is provided, libpymath will assume it is a 1xC matrix, where C is the length of the list provided:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">libpymath</span> <span class="k">as</span> <span class="nn">lpm</span>
+
+<span class="n">x</span> <span class="o">=</span> <span class="n">lpm</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">Matrix</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>A matrix can be created from a combination of all of this as well. For example, you can create a matrix with specified rows and columns from a 1-dimensional list of data:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">libpymath</span> <span class="k">as</span> <span class="nn">lpm</span>
+
+<span class="c1"># Create a 2x3 matrix containing:</span>
+<span class="c1"># [[1, 2, 3],</span>
+<span class="c1">#  [4, 5, 6]]</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">lpm</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">Matrix</span><span class="p">(</span><span class="n">rows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="printing-a-matrix">
+<h2>Printing a Matrix<a class="headerlink" href="#printing-a-matrix" title="Permalink to this headline">¶</a></h2>
+<p>Storing a matrix is useful, though being able to visualise it neatly and effectively is even more useful. Lucklily, libpymath does both. Printing a matrix is as easy as <code class="docutils literal notranslate"><span class="pre">print(mymatrix)</span></code>, with all the formatting and data processing done in the background.</p>
+<p>For example, printing a 3x5 matrix would look like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">libpymath</span> <span class="k">as</span> <span class="nn">lpm</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mf">2.718</span><span class="p">,</span> <span class="mf">3.14159</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mf">6.66</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mf">8.5</span><span class="p">,</span> <span class="mi">9</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mf">11.1</span><span class="p">,</span> <span class="mf">12.345</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">13</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">15</span><span class="p">]]</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">lpm</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">Matrix</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+<span class="c1"># Outputs:</span>
+<span class="c1"># [[ 1.0 ,  2.718,  3.14159,  4.0,  5.0]</span>
+<span class="c1">#  [ 6.66,  7.0  ,  8.5    ,  9.0, 10.0]</span>
+<span class="c1">#  [11.1 , 12.345, 13.0    , 14.0, 15.0]]</span>
+</pre></div>
+</div>
+<p>Notice how all of the decimal points are aligned, as well as the columns of the matrix? This is to make it easier to understand the data in the matrix and improves its readability.</p>
+<p>A common issue is that printing a matrix results in it wrapping onto multiple lines, ruining its appearence, however libpymath concatentes matrices over a certain size so that all of the data can fit onto the screen. For example, here is a 1000x1000 matrix:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">libpymath</span> <span class="k">as</span> <span class="nn">lpm</span>
+
+<span class="c1"># Create a 1000x1000 matrix</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">lpm</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">Matrix</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+<span class="c1"># This outputs the following*:</span>
+<span class="c1"># [[0.0, 0.0, 0.0  ***  0.0, 0.0, 0.0]</span>
+<span class="c1">#  [0.0, 0.0, 0.0  ***  0.0, 0.0, 0.0]</span>
+<span class="c1">#  [0.0, 0.0, 0.0  ***  0.0, 0.0, 0.0]</span>
+<span class="c1">#   ***  ***  ***       ***  ***  ***</span>
+<span class="c1">#  [0.0, 0.0, 0.0  ***  0.0, 0.0, 0.0]</span>
+<span class="c1">#  [0.0, 0.0, 0.0  ***  0.0, 0.0, 0.0]</span>
+<span class="c1">#  [0.0, 0.0, 0.0  ***  0.0, 0.0, 0.0]]</span>
+
+<span class="c1"># Note that creating a matrix without</span>
+<span class="c1"># specified data may lead to some values</span>
+<span class="c1"># being non-zero, or even NaN in some</span>
+<span class="c1"># cases. This can be mitigated with the</span>
+<span class="c1"># Matrix.fillScalar(x) function</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="index.html" class="btn btn-neutral float-left" title="Libpymath Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Toby Davis
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

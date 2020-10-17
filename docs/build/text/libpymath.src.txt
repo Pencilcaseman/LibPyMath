@@ -1,0 +1,18 @@
+libpymath.src package
+*********************
+
+
+Subpackages
+===========
+
+* libpymath.src.error package
+
+  * Module contents
+
+* libpymath.src.matrix package
+
+  * Module contents
+
+
+Module contents
+===============
