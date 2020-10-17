@@ -403,7 +403,7 @@ void doubleMatrixFillDescending(double *a, long int rows, long long cols, long i
 
         double fill;
 
-#		pragma omp parallel for private(i, j, fill) shared(a, rows, cols, rowStrideA, colStrideA) default(none)
+#		pragma omp parallel for private(i, j, fill) shared(a, max, rows, cols, rowStrideA, colStrideA) default(none)
         for (i = 0; i < rows; i++) {
             for (j = 0; j < cols - 3; j += 4) {
                 fill = (double) (j + i * cols);
@@ -441,9 +441,7 @@ void doubleMatrixFillRandomRange(double *a, double min, double max, long int row
         omp_set_num_threads(threads);
 #       endif
 
-        double fill;
-
-#		pragma omp parallel for private(i, j, fill) shared(a, min, max, rows, cols, rowStrideA, colStrideA) default(none)
+#		pragma omp parallel for private(i, j) shared(a, min, max, rows, cols, rowStrideA, colStrideA) default(none)
         for (i = 0; i < rows; i++) {
             for (j = 0; j < cols - 3; j += 4) {
                 a[internalGet(i, j, rowStrideA, colStrideA)] = randomRange(min, max);
