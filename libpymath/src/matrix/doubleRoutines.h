@@ -299,7 +299,7 @@ void doubleMatrixDivScalar(double *a, double b, double *c, long int rows, long l
     }
 }
 
-void doubleMatrixFillScalar(double *a, double scalar, long int rows, long long cols, long int rowStrideA, long int colStrideA, int threads) {
+void doubleMatrixFillScalar(double *a, const double scalar, long int rows, long long cols, long int rowStrideA, long int colStrideA, int threads) {
     if (rows * cols < 90000) {
         long long i, j;
         for (i = 0; i < rows; i++) {
@@ -320,7 +320,7 @@ void doubleMatrixFillScalar(double *a, double scalar, long int rows, long long c
         omp_set_num_threads(threads);
 #       endif
 
-#		pragma omp parallel for private(i, j) shared(a, scalar, rows, cols, rowStrideA, colStrideA) default(none)
+#		pragma omp parallel for private(i, j) shared(a, rows, cols, rowStrideA, colStrideA) default(none)
         for (i = 0; i < rows; i++) {
             for (j = 0; j < cols - 3; j += 4) {
                 a[internalGet(i, j, rowStrideA, colStrideA)] = scalar;
@@ -416,7 +416,7 @@ void doubleMatrixFillDescending(double *a, long int rows, long long cols, long i
     }
 }
 
-void doubleMatrixFillRandomRange(double *a, double min, double max, long int rows, long long cols, long int rowStrideA, long int colStrideA, int threads) {
+void doubleMatrixFillRandomRange(double *a, const double min, const double max, long int rows, long long cols, long int rowStrideA, long int colStrideA, int threads) {
     if (rows * cols < 90000) {
         long long i, j;
         for (i = 0; i < rows; i++) {
