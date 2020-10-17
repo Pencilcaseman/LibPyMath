@@ -13,22 +13,22 @@ __all__ = ["Matrix", "SCALAR", "ASCENDING", "DESCENDING", "RANDOM", "SIGMOID", "
            "D_SIGMOID", "D_TANH", "D_ReLU", "D_LEAKY_ReLU"]
 
 # Matrix fill options
-SCALAR = 0
-ASCENDING = 1
-DESCENDING = 2
-RANDOM = 3
+SCALAR = 1 << 0
+ASCENDING = 1 << 1
+DESCENDING = 1 << 2
+RANDOM = 1 << 3
 
 # Matrix map options
-SIGMOID = 4
-TANH = 5
-ReLU = 6
-LEAKY_ReLU = 7
+SIGMOID = 1 << 4
+TANH = 1 << 5
+ReLU = 1 << 6
+LEAKY_ReLU = 1 << 7
 
 # Matrix map derivative options
-D_SIGMOID = 8
-D_TANH = 9
-D_ReLU = 10
-D_LEAKY_ReLU = 11
+D_SIGMOID = 1 << 8
+D_TANH = 1 << 9
+D_ReLU = 1 << 10
+D_LEAKY_ReLU = 1 << 11
 
 
 # The Matrix class
@@ -184,6 +184,10 @@ class Matrix:
                             cols = len(tmp) // rows
                             if rows * cols != len(tmp):
                                 raise ValueError("Impossible to make dimensions fit the supplied data. Closest fit is {}x{}".format(rows, cols))
+                        else:
+                            # No rows or columns specified
+                            rows = 1
+                            cols = len(data)
                 else:
                     # Check against a 2d list
                     if rows is not None and cols is not None:
