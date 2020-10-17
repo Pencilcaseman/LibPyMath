@@ -358,10 +358,12 @@ void doubleMatrixFillAscending(double *a, long int rows, long long cols, long in
         omp_set_num_threads(threads);
 #       endif
 
-#		pragma omp parallel for private(i, j) shared(a, rows, cols, rowStrideA, colStrideA) default(none)
+        double fill;
+
+#		pragma omp parallel for private(i, j, fill) shared(a, rows, cols, rowStrideA, colStrideA) default(none)
         for (i = 0; i < rows; i++) {
             for (j = 0; j < cols - 3; j += 4) {
-                double fill = (double) (j + i * cols);
+                fill = (double) (j + i * cols);
                 a[internalGet(i, j, rowStrideA, colStrideA)] = fill;
                 a[internalGet(i, j, rowStrideA, colStrideA) + 1] = fill + 1;
                 a[internalGet(i, j, rowStrideA, colStrideA) + 2] = fill + 2;
@@ -399,10 +401,12 @@ void doubleMatrixFillDescending(double *a, long int rows, long long cols, long i
         omp_set_num_threads(threads);
 #       endif
 
-#		pragma omp parallel for private(i, j) shared(a, rows, cols, rowStrideA, colStrideA) default(none)
+        double fill;
+
+#		pragma omp parallel for private(i, j, fill) shared(a, rows, cols, rowStrideA, colStrideA) default(none)
         for (i = 0; i < rows; i++) {
             for (j = 0; j < cols - 3; j += 4) {
-                double fill = (double) (j + i * cols);
+                fill = (double) (j + i * cols);
                 a[internalGet(i, j, rowStrideA, colStrideA)] = max - fill;
                 a[internalGet(i, j, rowStrideA, colStrideA) + 1] = max - (fill + 1);
                 a[internalGet(i, j, rowStrideA, colStrideA) + 2] = max - (fill + 2);
@@ -416,12 +420,11 @@ void doubleMatrixFillDescending(double *a, long int rows, long long cols, long i
     }
 }
 
-void doubleMatrixFillRandomRange(double *a, const double min, const double max, long int rows, long long cols, long int rowStrideA, long int colStrideA, int threads) {
+void doubleMatrixFillRandomRange(double *a, double min, double max, long int rows, long long cols, long int rowStrideA, long int colStrideA, int threads) {
     if (rows * cols < 90000) {
         long long i, j;
         for (i = 0; i < rows; i++) {
             for (j = 0; j < cols - 3; j += 4) {
-                double fill = (double) (j + i * cols);
                 a[internalGet(i, j, rowStrideA, colStrideA)] = randomRange(min, max);
                 a[internalGet(i, j, rowStrideA, colStrideA) + 1] = randomRange(min, max);
                 a[internalGet(i, j, rowStrideA, colStrideA) + 2] = randomRange(min, max);
@@ -438,10 +441,11 @@ void doubleMatrixFillRandomRange(double *a, const double min, const double max, 
         omp_set_num_threads(threads);
 #       endif
 
-#		pragma omp parallel for private(i, j) shared(a, min, max, rows, cols, rowStrideA, colStrideA) default(none)
+        double fill;
+
+#		pragma omp parallel for private(i, j, fill) shared(a, min, max, rows, cols, rowStrideA, colStrideA) default(none)
         for (i = 0; i < rows; i++) {
             for (j = 0; j < cols - 3; j += 4) {
-                double fill = (double) (j + i * cols);
                 a[internalGet(i, j, rowStrideA, colStrideA)] = randomRange(min, max);
                 a[internalGet(i, j, rowStrideA, colStrideA) + 1] = randomRange(min, max);
                 a[internalGet(i, j, rowStrideA, colStrideA) + 2] = randomRange(min, max);
