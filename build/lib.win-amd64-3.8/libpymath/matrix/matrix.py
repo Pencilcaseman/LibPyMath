@@ -9,8 +9,8 @@ except ImportError:
 
 import libpymath.core.matrix as _matrix
 
-__all__ = ["Matrix", "SCALAR", "ASCENDING", "DESCENDING", "RANDOM", "SIGMOID", "TANH", "ReLU", "LEAKY_ReLU",
-           "D_SIGMOID", "D_TANH", "D_ReLU", "D_LEAKY_ReLU"]
+__all__ = ["Matrix", "SCALAR", "ASCENDING", "DESCENDING", "RANDOM", "SIGMOID", "TANH", "RELU", "LEAKY_RELU",
+           "D_SIGMOID", "D_TANH", "D_RELU", "D_LEAKY_RELU"]
 
 # Matrix fill options
 SCALAR = 1 << 0
@@ -21,14 +21,14 @@ RANDOM = 1 << 3
 # Matrix map options
 SIGMOID = 1 << 4
 TANH = 1 << 5
-ReLU = 1 << 6
-LEAKY_ReLU = 1 << 7
+RELU = 1 << 6
+LEAKY_RELU = 1 << 7
 
 # Matrix map derivative options
 D_SIGMOID = 1 << 8
 D_TANH = 1 << 9
-D_ReLU = 1 << 10
-D_LEAKY_ReLU = 1 << 11
+D_RELU = 1 << 10
+D_LEAKY_RELU = 1 << 11
 
 
 # The Matrix class
@@ -509,13 +509,13 @@ class Matrix:
         Valid functions are:
         SIGMOID
         TANH
-        ReLU
-        LEAKY_ReLU
+        RELU
+        LEAKY_RELU
 
         D_SIGMOID
         D_TANH
-        D_ReLU
-        D_LEAKY_ReLU
+        D_RELU
+        D_LEAKY_RELU
 
         :param mapType: Function to map with
         :return: None
@@ -525,18 +525,18 @@ class Matrix:
             self.matrix.matrixMapSigmoid()
         elif mapType == TANH:
             self.matrix.matrixMapTanh()
-        elif mapType == ReLU:
-            self.matrix.matrixMapReLU()
-        elif mapType == LEAKY_ReLU:
-            self.matrix.matrixMapLeakyReLU()
+        elif mapType == RELU:
+            self.matrix.matrixMapRELU()
+        elif mapType == LEAKY_RELU:
+            self.matrix.matrixMapLeakyRELU()
         elif mapType == D_SIGMOID:
             self.matrix.matrixMapSigmoidDerivative()
         elif mapType == D_TANH:
             self.matrix.matrixMapTanhDerivative()
-        elif mapType == D_ReLU:
-            self.matrix.matrixMapReLUDerivative()
-        elif mapType == D_LEAKY_ReLU:
-            self.matrix.matrixMapLeakyReLUDerivative()
+        elif mapType == D_RELU:
+            self.matrix.matrixMapRELUDerivative()
+        elif mapType == D_LEAKY_RELU:
+            self.matrix.matrixMapLeakyRELUDerivative()
         else:
             raise TypeError("Invalid mapping type")
 
