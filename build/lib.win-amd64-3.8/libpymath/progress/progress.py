@@ -265,7 +265,7 @@ class Progress:
 
 		if self.idleUpdate is None:
 			if not self.erase:
-				print(self._eval(), end="")
+				print(self._eval())
 			else:
 				print("\r", end="")
 				print(" " * shutil.get_terminal_size(fallback=(120, 50)).columns, end="")
