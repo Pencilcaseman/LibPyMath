@@ -5,10 +5,13 @@
 #include <structmember.h>
 #include <time.h>
 #include <math.h>
+#include <stdio.h>
 
 #ifdef _OPENMP
 #include <omp.h>
 #endif
+
+static int firstRand = 1;
 
 // Print to python stdout
 void pythonPrint(const char *text) {
@@ -91,6 +94,11 @@ static double *allocateMemory(long long length) {
 }
 
 double randomRange(double min, double max) {
+    if (firstRand == 1) {
+        srand((unsigned int) (TIME * 10000));
+        firstRand--;
+    }
+
     double range = (max - min);
     double div = RAND_MAX / range;
     return min + (rand() / div);

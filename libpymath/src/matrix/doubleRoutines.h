@@ -462,10 +462,10 @@ void doubleMatrixFillRandomRange(double *a, double min, double max, long int row
 #define RELU(x) ((x) > 0 ? (x) : 0)
 #define LEAKY_RELU(x) ((x) > 0 ? (x) : ((x) * 0.2))
 
-#define D_SIGMOID(x) ((x) * (1 - (x)))
-#define D_TANH(x) (1 / (cosh((x)) * cosh((x))))
-#define D_RELU(x) ((x) > 0 ? 1 : 0)
-#define D_LEAKY_RELU(x) ((x) > 0 ? 1 : 0.2)
+#define D_SIGMOID(y) ((y) * (1 - (y)))
+#define D_TANH(y) (1 - ((y) * (y)))
+#define D_RELU(y) ((y) > 0 ? 1 : 0)
+#define D_LEAKY_RELU(y) ((y) > 0 ? 1 : 0.2)
 
 void doubleMatrixMapSigmoid(double *a, long int rows, long long cols, long int rowStrideA, long int colStrideA, int threads) {
     if (rows * cols < 90000) {

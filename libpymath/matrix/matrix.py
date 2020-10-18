@@ -13,22 +13,22 @@ __all__ = ["Matrix", "SCALAR", "ASCENDING", "DESCENDING", "RANDOM", "SIGMOID", "
            "D_SIGMOID", "D_TANH", "D_RELU", "D_LEAKY_RELU"]
 
 # Matrix fill options
-SCALAR = 1 << 0
-ASCENDING = 1 << 1
-DESCENDING = 1 << 2
-RANDOM = 1 << 3
+SCALAR = 1
+ASCENDING = 2
+DESCENDING = 3
+RANDOM = 4
 
-# Matrix map options
-SIGMOID = 1 << 4
-TANH = 1 << 5
-RELU = 1 << 6
-LEAKY_RELU = 1 << 7
+# Matrix map options (shift 5 left for corresponding derivative)
+SIGMOID = 1 << 5
+TANH = 1 << 6
+RELU = 1 << 7
+LEAKY_RELU = 1 << 8
 
-# Matrix map derivative options
-D_SIGMOID = 1 << 8
-D_TANH = 1 << 9
-D_RELU = 1 << 10
-D_LEAKY_RELU = 1 << 11
+# Matrix map derivative options (shift 5 right for corresponding activation)
+D_SIGMOID = 1 << 10
+D_TANH = 1 << 11
+D_RELU = 1 << 12
+D_LEAKY_RELU = 1 << 13
 
 
 # The Matrix class
@@ -334,7 +334,7 @@ class Matrix:
         if isinstance(other, Matrix) and self.matrix.cols == other.matrix.rows:
             return Matrix._internal_new(self.matrix.matrixProduct(other.matrix, self.threads), self._dtype, self.threads)
         else:
-            raise TypeError("Invalid matrix size for matrix addition")
+            raise TypeError("Invalid matrix size for matrix product")
 
     def __matmul__(self, other):
         """
