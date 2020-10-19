@@ -207,6 +207,26 @@ static PyObject *matrixGetColStride(MatrixCoreObject *self, void *closure) {
     return PyLong_FromLong(self->colStride);
 }
 
+static PyObject *matrixSum(MatrixCoreObject *self, PyObject *args) {
+    int threads = 1;
+
+    if (!PyArg_ParseTuple(args, "|i", &threads)) {
+        return NULL;
+    }
+
+    return Py_BuildValue("d", doubleMatrixSum(self->data, self->rows, self->cols, self->rowStride, self->colStride, threads));
+}
+
+static PyObject *matrixMean(MatrixCoreObject *self, PyObject *args) {
+    int threads = 1;
+
+    if (!PyArg_ParseTuple(args, "|i", &threads)) {
+        return NULL;
+    }
+
+    return Py_BuildValue("d", doubleMatrixMean(self->data, self->rows, self->cols, self->rowStride, self->colStride, threads));
+}
+
 static PyObject *matrixTransposeReturn(MatrixCoreObject *self) {
     double *res = allocateMemory(self->rows * self->cols);
     long rows, cols, i, j, rs, cs;
@@ -691,7 +711,9 @@ static PyMethodDef matrixMethods[] = {
         {"matrixMapRELUDerivative",      (PyCFunction) matrixMapRELUDerivative,      METH_VARARGS, "Apply the RELU derivative function to every element in a matrix"},
         {"matrixMapLeakyRELUDerivative", (PyCFunction) matrixMapLeakyRELUDerivative, METH_VARARGS, "Apply the derivative of the leaky variant of the RELU function to every element in a matrix"},
         {"matrixToList",                 (PyCFunction) matrixToList,                 METH_NOARGS,  "Return the matrix represented as a 2D python list"},
-        {"matrixReshape",                (PyCFunction) matrixReshape,                METH_VARARGS,  "Resize the matrix"},
+        {"matrixReshape",                (PyCFunction) matrixReshape,                METH_VARARGS, "Resize the matrix"},
+        {"matrixSum",                    (PyCFunction) matrixSum,                    METH_VARARGS, "Calculate the sum of all values in the matrix"},
+        {"matrixMean",                   (PyCFunction) matrixMean,                   METH_VARARGS, "Calculate the mean of all values in the matrix"},
         {NULL}
 };
 

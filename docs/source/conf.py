@@ -24,7 +24,7 @@ copyright = '2020, Toby Davis'
 author = 'Toby Davis'
 
 # The full version, including alpha/beta/rc tags
-release = '0.5.0'
+release = '0.6.0'
 
 # Set the master file
 master_doc = 'index'

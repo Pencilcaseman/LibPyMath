@@ -3,6 +3,89 @@
 
 #include <libpymath/src/internal.h>
 
+
+double doubleMatrixSum(double *a, long int rows, long long cols, long int rowStrideA, long int colStrideA, int threads) {
+    double res = 0;
+
+    if (rows * cols < 90000) {
+        long long i, j;
+        for (i = 0; i < rows; i++) {
+            for (j = 0; j < cols - 3; j += 4) {
+                res += a[internalGet(i, j, rowStrideA, colStrideA)];
+                res += a[internalGet(i, j, rowStrideA, colStrideA) + 1];
+                res += a[internalGet(i, j, rowStrideA, colStrideA) + 2];
+                res += a[internalGet(i, j, rowStrideA, colStrideA) + 3];
+            }
+
+            for (; j < cols; j++) {
+                res += a[internalGet(i, j, rowStrideA, colStrideA)];
+            }
+        }
+    } else {
+        long long i, j;
+#       ifdef _OPENMP
+        omp_set_num_threads(threads);
+#       endif
+
+#       pragma omp parallel for private(i, j) shared(a, b, c, rows, cols, rowStrideA, colStrideA, rowStrideB, colStrideB) default(none)
+        for (i = 0; i < rows; i++) {
+            for (j = 0; j < cols - 3; j += 4) {
+                res += a[internalGet(i, j, rowStrideA, colStrideA)];
+                res += a[internalGet(i, j, rowStrideA, colStrideA) + 1];
+                res += a[internalGet(i, j, rowStrideA, colStrideA) + 2];
+                res += a[internalGet(i, j, rowStrideA, colStrideA) + 3];
+            }
+
+            for (; j < cols; j++) {
+                res += a[internalGet(i, j, rowStrideA, colStrideA)];
+            }
+        }
+    }
+
+    return res;
+}
+
+double doubleMatrixMean(double *a, long int rows, long long cols, long int rowStrideA, long int colStrideA, int threads) {
+    double res = 0;
+
+    if (rows * cols < 90000) {
+        long long i, j;
+        for (i = 0; i < rows; i++) {
+            for (j = 0; j < cols - 3; j += 4) {
+                res += a[internalGet(i, j, rowStrideA, colStrideA)];
+                res += a[internalGet(i, j, rowStrideA, colStrideA) + 1];
+                res += a[internalGet(i, j, rowStrideA, colStrideA) + 2];
+                res += a[internalGet(i, j, rowStrideA, colStrideA) + 3];
+            }
+
+            for (; j < cols; j++) {
+                res += a[internalGet(i, j, rowStrideA, colStrideA)];
+            }
+        }
+    } else {
+        long long i, j;
+#       ifdef _OPENMP
+        omp_set_num_threads(threads);
+#       endif
+
+#       pragma omp parallel for private(i, j) shared(a, b, c, rows, cols, rowStrideA, colStrideA, rowStrideB, colStrideB) default(none)
+        for (i = 0; i < rows; i++) {
+            for (j = 0; j < cols - 3; j += 4) {
+                res += a[internalGet(i, j, rowStrideA, colStrideA)];
+                res += a[internalGet(i, j, rowStrideA, colStrideA) + 1];
+                res += a[internalGet(i, j, rowStrideA, colStrideA) + 2];
+                res += a[internalGet(i, j, rowStrideA, colStrideA) + 3];
+            }
+
+            for (; j < cols; j++) {
+                res += a[internalGet(i, j, rowStrideA, colStrideA)];
+            }
+        }
+    }
+
+    return res / (double) (rows * cols);
+}
+
 void doubleMatrixAddMatrix(double *a, double *b, double *c, long int rows, long long cols, long int rowStrideA, long int colStrideA, long int rowStrideB, long int colStrideB, int threads) {
     if (rows * cols < 90000) {
         long long i, j;

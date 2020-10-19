@@ -346,6 +346,12 @@ class Matrix:
 
         return self.dot(other)
 
+    def sum(self):
+        return self.matrix.matrixSum()
+
+    def mean(self):
+        return self.matrix.matrixMean()
+
     def __add__(self, other):
         """
         Add a matrix to another matrix elementwise, or add a scalar to every value

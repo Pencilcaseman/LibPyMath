@@ -16,6 +16,8 @@ libpymath/matrix/matrix.py
 libpymath/matrix/__pycache__/__init__.cpython-38.pyc
 libpymath/matrix/__pycache__/_threadSetup.cpython-38.pyc
 libpymath/matrix/__pycache__/matrix.cpython-38.pyc
+libpymath/network/__init__.py
+libpymath/network/network.py
 libpymath/progress/__init__.py
 libpymath/progress/progress.py
 libpymath/src/__init__.py

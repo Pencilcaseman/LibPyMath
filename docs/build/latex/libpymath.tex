@@ -73,8 +73,8 @@
 
 
 \title{libpymath}
-\date{Oct 17, 2020}
-\release{0.5.0}
+\date{Oct 19, 2020}
+\release{0.6.0}
 \author{Toby Davis}
 \newcommand{\sphinxlogo}{\vbox{}}
 \renewcommand{\releasename}{Release}
@@ -313,13 +313,13 @@ Apply a function to every element of the matrix.
 Valid functions are:
 SIGMOID
 TANH
-ReLU
-LEAKY\_ReLU
+RELU
+LEAKY\_RELU
 
 D\_SIGMOID
 D\_TANH
-D\_ReLU
-D\_LEAKY\_ReLU
+D\_RELU
+D\_LEAKY\_RELU
 \begin{quote}\begin{description}
 \item[{Parameters}] \leavevmode
 \sphinxstyleliteralstrong{\sphinxupquote{mapType}} \textendash{} Function to map with
@@ -345,6 +345,12 @@ Mapped matrix
 
 \end{description}\end{quote}
 
+\end{fulllineitems}
+
+\index{mean() (libpymath.matrix.matrix.Matrix method)@\spxentry{mean()}\spxextra{libpymath.matrix.matrix.Matrix method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{libpymath.matrix:libpymath.matrix.matrix.Matrix.mean}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{mean}}}{}{}
 \end{fulllineitems}
 
 \index{reshape() (libpymath.matrix.matrix.Matrix method)@\spxentry{reshape()}\spxextra{libpymath.matrix.matrix.Matrix method}}
@@ -415,6 +421,12 @@ return
 
 \end{description}\end{quote}
 
+\end{fulllineitems}
+
+\index{sum() (libpymath.matrix.matrix.Matrix method)@\spxentry{sum()}\spxextra{libpymath.matrix.matrix.Matrix method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{libpymath.matrix:libpymath.matrix.matrix.Matrix.sum}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{sum}}}{}{}
 \end{fulllineitems}
 
 \index{threads() (libpymath.matrix.matrix.Matrix property)@\spxentry{threads()}\spxextra{libpymath.matrix.matrix.Matrix property}}

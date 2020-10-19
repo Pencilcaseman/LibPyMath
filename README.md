@@ -15,20 +15,11 @@ Run ```pip install libpymath``` to dowload and install ```libpymath``` for your 
 ---
 
 ## Features and usage
-### Matrix math
+### Matrix Math
 Easily create, manipulate and perform calculations with dense matrices. The matrices themselves are stored and manipulated with optimised C code, resulting in faster operations and more efficient calculations. To further increase the speed of the calculations, when libpymath imported into a project for the first time, it runs some tests on the CPU to find the optimal number of threads to use for the matrix calculations.
 
-The matrix library contains many features, such as:
-1. Elementwise addition, subtraction, multiplication and division with another matrix
-2. Addition, subtraction, multiplication and division by a scalar
-3. Matrix transpose,
-4. Matrix product,
-5. Filling a matrix with ascending values, descending values, random values or a single value
-6. Getting or setting values
-7. Creating a matrix from data
-8. Mapping with sigmoid, tanh, ReLU and leaky ReLU, as well as their derivatives
-9. Getting the matrix as a Python list
-10. Supports pickling with the standard library ```pickle``` module
-11. Formatting and printing a matrix
+### Progress Bars
+Wrap a progress bar around any Python iterator and have a progress bar generated automatically. The progress bar will adjust its width to the width of the console, shows the current percentage, time and time remaining, as well as the number of iterations per second the bar is running at. The rate at which the bar updates also adjusts dynamically, ensuring that it has a minimal impact on the speed of the loop, while updating frequently enough to provide relevant information.
 
-\* Due to Clang on Mac OS the wheels do not support OpenMP, meaning some matrix operations may be slower than on other operating systems.
+### Neural Networks
+Create, train and evaluate a neural network in only a few lines of code, customising the size of the network, its learning rate, it's activation functions (which can be customised on a per-layer basis) and the metrics which it logs. The network library also uses the efficient Matrix library, meaning it can train a simple network in under a second. You can also plot a graph of any metrics that are being logged, making it easy to evaluate the progress of the network.
