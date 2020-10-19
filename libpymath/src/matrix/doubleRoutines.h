@@ -27,7 +27,7 @@ double doubleMatrixSum(double *a, long int rows, long long cols, long int rowStr
         omp_set_num_threads(threads);
 #       endif
 
-#       pragma omp parallel for private(i, j) shared(a, b, c, rows, cols, rowStrideA, colStrideA, rowStrideB, colStrideB) default(none)
+#       pragma omp parallel for private(i, j) shared(a, res, rows, cols, rowStrideA, colStrideA) default(none)
         for (i = 0; i < rows; i++) {
             for (j = 0; j < cols - 3; j += 4) {
                 res += a[internalGet(i, j, rowStrideA, colStrideA)];
@@ -68,7 +68,7 @@ double doubleMatrixMean(double *a, long int rows, long long cols, long int rowSt
         omp_set_num_threads(threads);
 #       endif
 
-#       pragma omp parallel for private(i, j) shared(a, b, c, rows, cols, rowStrideA, colStrideA, rowStrideB, colStrideB) default(none)
+#       pragma omp parallel for private(i, j) shared(a, res, rows, cols, rowStrideA, colStrideA) default(none)
         for (i = 0; i < rows; i++) {
             for (j = 0; j < cols - 3; j += 4) {
                 res += a[internalGet(i, j, rowStrideA, colStrideA)];
